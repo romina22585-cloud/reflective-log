@@ -1,0 +1,73 @@
+.page {
+  animation: fadeUp 0.4s ease forwards;
+}
+
+.header {
+  margin-bottom: 1.5rem;
+}
+
+.date {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 300;
+  margin-top: 0.6rem;
+  margin-bottom: 0.3rem;
+}
+
+.time {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  letter-spacing: 0.04em;
+}
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.section {
+  border-left: 2px solid var(--gold-light);
+  padding-left: 1.1rem;
+}
+
+.sectionLabel {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 0.4rem;
+}
+
+.sectionText {
+  font-size: 1rem;
+  color: var(--ink-soft);
+  line-height: 1.75;
+  white-space: pre-wrap;
+}
+
+.stars {
+  font-size: 1.4rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+}
+
+.freewrite {
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+  font-family: var(--font-display);
+  font-weight: 300;
+}
+
+.notFound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 1rem;
+  text-align: center;
+  color: var(--ink-muted);
+}

@@ -1,0 +1,206 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  animation: fadeUp 0.4s ease forwards;
+}
+
+.greeting {
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--parchment-deeper);
+}
+
+.greetingLabel {
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 0.2rem;
+}
+
+.greetingName {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 6vw, 3.2rem);
+  font-weight: 300;
+  color: var(--ink);
+  line-height: 1.1;
+  text-transform: capitalize;
+}
+
+.greetingDate {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  font-style: italic;
+}
+
+.section {}
+
+.sectionTitle {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 1rem;
+}
+
+/* Entry type cards */
+.entryCards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.entryTypeCard {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  background: white;
+  border: 1px solid var(--parchment-deeper);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: left;
+  transition: all 200ms ease;
+  position: relative;
+  width: 100%;
+}
+
+.entryTypeCard:hover {
+  border-color: var(--gold);
+  box-shadow: 0 4px 16px rgba(201, 150, 58, 0.1);
+  transform: translateY(-1px);
+}
+
+.entryTypeCard.done {
+  background: var(--parchment);
+  border-color: var(--parchment-deeper);
+}
+
+.typeIcon {
+  font-size: 1.3rem;
+  color: var(--gold);
+  flex-shrink: 0;
+  width: 1.8rem;
+  text-align: center;
+}
+
+.typeName {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--ink);
+  margin-bottom: 0.15rem;
+}
+
+.typeHint {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+}
+
+.doneBadge {
+  margin-left: auto;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  background: var(--sage);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  flex-shrink: 0;
+}
+
+/* Entry list */
+.entryList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.entryRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1rem 1.1rem;
+  background: white;
+  border: 1px solid var(--parchment-deeper);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  position: relative;
+  transition: all 200ms ease;
+  animation: fadeUp 0.3s ease both;
+}
+
+.entryRow:hover {
+  border-color: var(--parchment-deeper);
+  box-shadow: var(--shadow);
+  transform: translateX(3px);
+}
+
+.entryMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.entryDate {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  letter-spacing: 0.03em;
+}
+
+.entryPreview {
+  font-size: 0.875rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  padding-right: 2rem;
+}
+
+.deleteBtn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--ink-muted);
+  cursor: pointer;
+  font-size: 0.7rem;
+  padding: 0.3rem;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  border-radius: var(--radius);
+}
+
+.entryRow:hover .deleteBtn {
+  opacity: 1;
+}
+
+.deleteBtn:hover {
+  color: var(--rust);
+  background: rgba(160, 82, 45, 0.08);
+}
+
+.empty {
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--ink-muted);
+}
+
+.emptyIcon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--parchment-deeper);
+}

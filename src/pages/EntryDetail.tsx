@@ -86,7 +86,7 @@ export default function EntryDetail() {
           {Object.entries(entry.content as DailyContent).map(([key, value]) => (
             <div key={key} className={styles.section}>
               <p className={styles.sectionLabel}>{DAILY_LABELS[key] || key}</p>
-              <p className={styles.sectionText}>{value}</p>
+              <p className={styles.sectionText}>{String(value ?? "")}</p>
             </div>
           ))}
         </div>

@@ -1,6 +1,7 @@
 export type EntryType = 'daily' | 'freewrite' | 'weekly' | 'morning'
 
 export interface DailyContent {
+  [key: string]: unknown
   highlight: string
   challenge: string
   decision: string
@@ -9,6 +10,7 @@ export interface DailyContent {
 }
 
 export interface MorningContent {
+  [key: string]: unknown
   energy: number
   gratitude: string
   intention: string
@@ -16,11 +18,13 @@ export interface MorningContent {
 }
 
 export interface FreewriteContent {
+  [key: string]: unknown
   text: string
   articles?: Article[]
 }
 
 export interface WeeklyContent {
+  [key: string]: unknown
   wins: string
   patterns: string
   difficult: string

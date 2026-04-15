@@ -21,6 +21,9 @@ export const DEFAULT_HABITS = [
   { name: 'FIIT class (25-40 min)', emoji: '🏋️', is_default: true, sort_order: 13 },
 ]
 
+// Names that belong to the OLD default set — if user only has these, auto-migrate
+const OLD_DEFAULT_NAMES = ['Exercise / movement', 'Sleep quality', 'No alcohol', 'Meditation']
+
 function getTodayStr() {
   return format(new Date(), 'yyyy-MM-dd')
 }
@@ -33,13 +36,11 @@ export function useHabits() {
   const [today, setToday] = useState(getTodayStr)
   const dateCheckRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  // Watch for midnight — check every minute if the date has changed
   useEffect(() => {
     dateCheckRef.current = setInterval(() => {
       const newDay = getTodayStr()
       if (newDay !== today) {
         setToday(newDay)
-        // Reload logs so completed habits reset for the new day
         fetchLogs()
       }
     }, 60_000)
@@ -61,6 +62,15 @@ export function useHabits() {
     setLogs(data || [])
   }
 
+  const seedDefaults = async () => {
+    await supabase.from('habits').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+    await supabase.from('habits').insert(
+      DEFAULT_HABITS.map(h => ({ ...h, user_id: user!.id }))
+    )
+    const { data } = await supabase.from('habits').select('*').order('sort_order')
+    setHabits(data || [])
+  }
+
   const init = async () => {
     setLoading(true)
     const { data: existing } = await supabase
@@ -68,14 +78,17 @@ export function useHabits() {
       .select('*')
       .order('sort_order')
 
-    if (existing && existing.length === 0) {
-      await supabase.from('habits').insert(
-        DEFAULT_HABITS.map(h => ({ ...h, user_id: user!.id }))
-      )
-      const { data: seeded } = await supabase.from('habits').select('*').order('sort_order')
-      setHabits(seeded || [])
+    if (!existing || existing.length === 0) {
+      // No habits at all — seed defaults
+      await seedDefaults()
     } else {
-      setHabits(existing || [])
+      // Check if user only has old defaults — auto-migrate
+      const allOld = existing.every((h: Habit) => OLD_DEFAULT_NAMES.includes(h.name))
+      if (allOld) {
+        await seedDefaults()
+      } else {
+        setHabits(existing)
+      }
     }
 
     await fetchLogs()
@@ -112,12 +125,7 @@ export function useHabits() {
   }
 
   const resetToDefaults = async () => {
-    await supabase.from('habits').delete().neq('id', '00000000-0000-0000-0000-000000000000')
-    await supabase.from('habits').insert(
-      DEFAULT_HABITS.map(h => ({ ...h, user_id: user!.id }))
-    )
-    const { data } = await supabase.from('habits').select('*').order('sort_order')
-    setHabits(data || [])
+    await seedDefaults()
   }
 
   const isCompletedToday = (habitId: string) => {

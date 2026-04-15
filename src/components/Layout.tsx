@@ -13,7 +13,7 @@ export default function Layout() {
       <header className={styles.header}>
         <button className={styles.logo} onClick={() => navigate('/')}>
           <span className={styles.logoMark}>◆</span>
-          <span className={styles.logoText}>Reflective Log</span>
+          <span className={styles.logoText}>In Bloom</span>
         </button>
         <div className={styles.headerRight}>
           {!isHome && (

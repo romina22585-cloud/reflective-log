@@ -1,31 +1,73 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { Habit, HabitLog } from '../types'
 import { useAuth } from './useAuth'
 import { format } from 'date-fns'
 
-const DEFAULT_HABITS = [
-  { name: 'Exercise / movement', emoji: '🏃', is_default: true, sort_order: 0 },
-  { name: 'Sleep quality', emoji: '🌙', is_default: true, sort_order: 1 },
-  { name: 'No alcohol', emoji: '💧', is_default: true, sort_order: 2 },
-  { name: 'Meditation', emoji: '🧘', is_default: true, sort_order: 3 },
+export const DEFAULT_HABITS = [
+  { name: 'Water (min. 1.5lt)', emoji: '💧', is_default: true, sort_order: 0 },
+  { name: 'Meditation', emoji: '🧘', is_default: true, sort_order: 1 },
+  { name: 'Morning phone fasting', emoji: '📵', is_default: true, sort_order: 2 },
+  { name: 'Cold shower', emoji: '🚿', is_default: true, sort_order: 3 },
+  { name: 'Physical connection', emoji: '🤗', is_default: true, sort_order: 4 },
+  { name: 'Meet a friend / family', emoji: '👥', is_default: true, sort_order: 5 },
+  { name: 'Phone a friend / family', emoji: '📞', is_default: true, sort_order: 6 },
+  { name: 'Sun (min. 10 min)', emoji: '☀️', is_default: true, sort_order: 7 },
+  { name: 'Walk in nature', emoji: '🌿', is_default: true, sort_order: 8 },
+  { name: 'Fruit & veg (min. 8 types)', emoji: '🥦', is_default: true, sort_order: 9 },
+  { name: 'Sleep 7-9 hours', emoji: '🌙', is_default: true, sort_order: 10 },
+  { name: 'Walk (10,000 steps)', emoji: '👟', is_default: true, sort_order: 11 },
+  { name: 'Stretch class (20 min)', emoji: '🤸', is_default: true, sort_order: 12 },
+  { name: 'FIIT class (25-40 min)', emoji: '🏋️', is_default: true, sort_order: 13 },
 ]
+
+function getTodayStr() {
+  return format(new Date(), 'yyyy-MM-dd')
+}
 
 export function useHabits() {
   const { user } = useAuth()
   const [habits, setHabits] = useState<Habit[]>([])
   const [logs, setLogs] = useState<HabitLog[]>([])
   const [loading, setLoading] = useState(true)
-  const today = format(new Date(), 'yyyy-MM-dd')
+  const [today, setToday] = useState(getTodayStr)
+  const dateCheckRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  // Watch for midnight — check every minute if the date has changed
+  useEffect(() => {
+    dateCheckRef.current = setInterval(() => {
+      const newDay = getTodayStr()
+      if (newDay !== today) {
+        setToday(newDay)
+        // Reload logs so completed habits reset for the new day
+        fetchLogs()
+      }
+    }, 60_000)
+    return () => {
+      if (dateCheckRef.current) clearInterval(dateCheckRef.current)
+    }
+  }, [today])
 
   useEffect(() => {
     if (user) init()
   }, [user])
 
+  const fetchLogs = async () => {
+    const thirtyDaysAgo = format(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd')
+    const { data } = await supabase
+      .from('habit_logs')
+      .select('*')
+      .gte('logged_date', thirtyDaysAgo)
+    setLogs(data || [])
+  }
+
   const init = async () => {
     setLoading(true)
-    // Check if user has habits, if not seed defaults
-    const { data: existing } = await supabase.from('habits').select('*').order('sort_order')
+    const { data: existing } = await supabase
+      .from('habits')
+      .select('*')
+      .order('sort_order')
+
     if (existing && existing.length === 0) {
       await supabase.from('habits').insert(
         DEFAULT_HABITS.map(h => ({ ...h, user_id: user!.id }))
@@ -35,18 +77,14 @@ export function useHabits() {
     } else {
       setHabits(existing || [])
     }
-    // Fetch logs for last 30 days
-    const thirtyDaysAgo = format(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd')
-    const { data: logData } = await supabase
-      .from('habit_logs')
-      .select('*')
-      .gte('logged_date', thirtyDaysAgo)
-    setLogs(logData || [])
+
+    await fetchLogs()
     setLoading(false)
   }
 
   const toggleHabit = async (habitId: string) => {
-    const existing = logs.find(l => l.habit_id === habitId && l.logged_date === today)
+    const currentToday = getTodayStr()
+    const existing = logs.find(l => l.habit_id === habitId && l.logged_date === currentToday)
     if (existing) {
       await supabase.from('habit_logs').delete().eq('id', existing.id)
       setLogs(prev => prev.filter(l => l.id !== existing.id))
@@ -54,7 +92,7 @@ export function useHabits() {
       const { data } = await supabase.from('habit_logs').insert([{
         habit_id: habitId,
         user_id: user!.id,
-        logged_date: today,
+        logged_date: currentToday,
       }]).select().single()
       if (data) setLogs(prev => [...prev, data])
     }
@@ -73,8 +111,19 @@ export function useHabits() {
     setLogs(prev => prev.filter(l => l.habit_id !== id))
   }
 
-  const isCompletedToday = (habitId: string) =>
-    logs.some(l => l.habit_id === habitId && l.logged_date === today)
+  const resetToDefaults = async () => {
+    await supabase.from('habits').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+    await supabase.from('habits').insert(
+      DEFAULT_HABITS.map(h => ({ ...h, user_id: user!.id }))
+    )
+    const { data } = await supabase.from('habits').select('*').order('sort_order')
+    setHabits(data || [])
+  }
+
+  const isCompletedToday = (habitId: string) => {
+    const currentToday = getTodayStr()
+    return logs.some(l => l.habit_id === habitId && l.logged_date === currentToday)
+  }
 
   const getStreak = (habitId: string): number => {
     let streak = 0
@@ -91,5 +140,10 @@ export function useHabits() {
 
   const todayCompletedCount = habits.filter(h => isCompletedToday(h.id)).length
 
-  return { habits, logs, loading, toggleHabit, addHabit, deleteHabit, isCompletedToday, getStreak, todayCompletedCount, totalHabits: habits.length }
+  return {
+    habits, logs, loading, today,
+    toggleHabit, addHabit, deleteHabit, resetToDefaults,
+    isCompletedToday, getStreak,
+    todayCompletedCount, totalHabits: habits.length
+  }
 }

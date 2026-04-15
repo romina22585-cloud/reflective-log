@@ -3,10 +3,17 @@ import { useHabits } from '../hooks/useHabits'
 import styles from './HabitsTracker.module.css'
 
 export default function HabitsTracker() {
-  const { habits, loading, toggleHabit, addHabit, deleteHabit, isCompletedToday, getStreak, todayCompletedCount, totalHabits } = useHabits()
+  const {
+    habits, loading,
+    toggleHabit, addHabit, deleteHabit, resetToDefaults,
+    isCompletedToday, getStreak,
+    todayCompletedCount, totalHabits
+  } = useHabits()
+
   const [adding, setAdding] = useState(false)
   const [newName, setNewName] = useState('')
   const [newEmoji, setNewEmoji] = useState('✦')
+  const [confirmReset, setConfirmReset] = useState(false)
 
   const handleAdd = async () => {
     if (!newName.trim()) return
@@ -14,6 +21,11 @@ export default function HabitsTracker() {
     setNewName('')
     setNewEmoji('✦')
     setAdding(false)
+  }
+
+  const handleReset = async () => {
+    await resetToDefaults()
+    setConfirmReset(false)
   }
 
   if (loading) return null
@@ -49,18 +61,27 @@ export default function HabitsTracker() {
           const done = isCompletedToday(habit.id)
           const streak = getStreak(habit.id)
           return (
-            <div key={habit.id} className={`${styles.habitRow} ${done ? styles.habitDone : ''}`}>
-              <button className={styles.habitToggle} onClick={() => toggleHabit(habit.id)}>
-                <span className={styles.habitCheck}>{done ? '✓' : ''}</span>
-              </button>
+            <div
+              key={habit.id}
+              className={`${styles.habitRow} ${done ? styles.habitDone : ''}`}
+              onClick={() => toggleHabit(habit.id)}
+            >
+              {/* Large clear tick box */}
+              <div className={`${styles.checkbox} ${done ? styles.checkboxChecked : ''}`}>
+                {done && <span className={styles.checkmark}>✓</span>}
+              </div>
               <span className={styles.habitEmoji}>{habit.emoji}</span>
               <span className={styles.habitName}>{habit.name}</span>
-              {streak > 1 && (
-                <span className={styles.streak}>{streak}🔥</span>
-              )}
-              {!habit.is_default && (
-                <button className={styles.deleteHabit} onClick={() => deleteHabit(habit.id)} title="Remove habit">✕</button>
-              )}
+              <div className={styles.habitRight}>
+                {streak > 1 && (
+                  <span className={styles.streak}>{streak} 🔥</span>
+                )}
+                <button
+                  className={styles.deleteHabit}
+                  onClick={e => { e.stopPropagation(); deleteHabit(habit.id) }}
+                  title="Remove habit"
+                >✕</button>
+              </div>
             </div>
           )
         })}
@@ -70,7 +91,7 @@ export default function HabitsTracker() {
         <div className={styles.addForm}>
           <input
             type="text"
-            placeholder="Emoji"
+            placeholder="🙂"
             value={newEmoji}
             onChange={e => setNewEmoji(e.target.value)}
             className={styles.emojiInput}
@@ -78,7 +99,7 @@ export default function HabitsTracker() {
           />
           <input
             type="text"
-            placeholder="Habit name…"
+            placeholder="New habit name…"
             value={newName}
             onChange={e => setNewName(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleAdd()}
@@ -89,9 +110,22 @@ export default function HabitsTracker() {
           <button className="btn btn-ghost" onClick={() => setAdding(false)}>Cancel</button>
         </div>
       ) : (
-        <button className={styles.addBtn} onClick={() => setAdding(true)}>
-          + Add custom habit
-        </button>
+        <div className={styles.trackerFooter}>
+          <button className={styles.addBtn} onClick={() => setAdding(true)}>
+            + Add habit
+          </button>
+          {!confirmReset ? (
+            <button className={styles.resetBtn} onClick={() => setConfirmReset(true)}>
+              Reset to defaults
+            </button>
+          ) : (
+            <div className={styles.confirmReset}>
+              <span>Replace all habits with defaults?</span>
+              <button className={styles.confirmYes} onClick={handleReset}>Yes</button>
+              <button className={styles.confirmNo} onClick={() => setConfirmReset(false)}>No</button>
+            </div>
+          )}
+        </div>
       )}
     </div>
   )

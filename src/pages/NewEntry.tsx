@@ -4,7 +4,9 @@ import { useEntries } from '../hooks/useEntries'
 import { EntryType, DailyContent, FreewriteContent, WeeklyContent, MorningContent, Article } from '../types'
 import styles from './NewEntry.module.css'
 
-const DAILY_STEPS = [
+// Evening Check-in (was Daily) — now includes energy level as first step
+const EVENING_STEPS = [
+  { key: 'energy', label: 'Energy level', prompt: 'How is your energy right now at the end of the day?' },
   { key: 'highlight', label: 'Highlight of today', prompt: 'What was the most meaningful moment or achievement today — however small?' },
   { key: 'challenge', label: 'Challenge faced', prompt: 'What was difficult or draining today? What made it hard?' },
   { key: 'decision', label: 'A decision I made', prompt: 'Describe a decision you made today. What drove it? Would you decide the same again?' },
@@ -27,18 +29,36 @@ const MORNING_STEPS = [
   { key: 'lookingForward', label: "Something I'm looking forward to", prompt: 'What is something — however small — that you are looking forward to today?' },
 ]
 
+function EnergyPicker({ value, onChange }: { value: number; onChange: (n: number) => void }) {
+  return (
+    <div className={styles.energyPicker}>
+      {[1, 2, 3, 4, 5].map(n => (
+        <button key={n} className={`${styles.energyBtn} ${value === n ? styles.energyActive : ''}`} onClick={() => onChange(n)}>
+          <span className={styles.energyNum}>{n}</span>
+          <span className={styles.energyLabel}>{['Low', 'Tired', 'Ok', 'Good', 'Great'][n - 1]}</span>
+        </button>
+      ))}
+    </div>
+  )
+}
+
 function MorningForm({ onSave }: { onSave: (content: MorningContent) => void }) {
   const [step, setStep] = useState(0)
   const [energy, setEnergy] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const current = MORNING_STEPS[step]
   const isLast = step === MORNING_STEPS.length - 1
-  const isValid = current.key === 'energy' ? energy > 0 : answers[current.key]?.trim()
+  const isValid = current.key === 'energy' ? energy > 0 : !!(answers[current.key]?.trim())
 
   const handleNext = () => {
     if (!isValid) return
     if (isLast) {
-      onSave({ energy, gratitude: answers.gratitude, intention: answers.intention, lookingForward: answers.lookingForward })
+      onSave({
+        energy,
+        gratitude: answers.gratitude || '',
+        intention: answers.intention || '',
+        lookingForward: answers.lookingForward || '',
+      })
     } else {
       setStep(s => s + 1)
     }
@@ -56,14 +76,7 @@ function MorningForm({ onSave }: { onSave: (content: MorningContent) => void }) 
         <h2 className={styles.stepQuestion}>{current.label}</h2>
         <p className={styles.stepPrompt}>{current.prompt}</p>
         {current.key === 'energy' ? (
-          <div className={styles.energyPicker}>
-            {[1, 2, 3, 4, 5].map(n => (
-              <button key={n} className={`${styles.energyBtn} ${energy === n ? styles.energyActive : ''}`} onClick={() => setEnergy(n)}>
-                <span className={styles.energyNum}>{n}</span>
-                <span className={styles.energyLabel}>{['Low', 'Tired', 'Ok', 'Good', 'Great'][n - 1]}</span>
-              </button>
-            ))}
-          </div>
+          <EnergyPicker value={energy} onChange={setEnergy} />
         ) : (
           <div className="field">
             <textarea autoFocus placeholder="Write freely…" value={answers[current.key] || ''} onChange={e => setAnswers(a => ({ ...a, [current.key]: e.target.value }))} rows={4} />
@@ -80,33 +93,52 @@ function MorningForm({ onSave }: { onSave: (content: MorningContent) => void }) 
   )
 }
 
-function DailyForm({ onSave }: { onSave: (content: DailyContent) => void }) {
+function EveningForm({ onSave }: { onSave: (content: DailyContent) => void }) {
   const [step, setStep] = useState(0)
+  const [energy, setEnergy] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>({})
-  const current = DAILY_STEPS[step]
-  const isLast = step === DAILY_STEPS.length - 1
+  const current = EVENING_STEPS[step]
+  const isLast = step === EVENING_STEPS.length - 1
+  const isValid = current.key === 'energy' ? energy > 0 : !!(answers[current.key]?.trim())
 
   const handleNext = () => {
-    if (!answers[current.key]?.trim()) return
-    if (isLast) { onSave(answers as unknown as DailyContent) } else { setStep(s => s + 1) }
+    if (!isValid) return
+    if (isLast) {
+      onSave({
+        energy: energy as unknown as string,
+        highlight: answers.highlight || '',
+        challenge: answers.challenge || '',
+        decision: answers.decision || '',
+        emotion: answers.emotion || '',
+        tomorrow: answers.tomorrow || '',
+      } as unknown as DailyContent)
+    } else {
+      setStep(s => s + 1)
+    }
   }
 
   return (
     <div className={styles.form}>
       <div className={styles.progress}>
-        {DAILY_STEPS.map((_, i) => <div key={i} className={`${styles.progressDot} ${i <= step ? styles.progressDotActive : ''}`} />)}
+        {EVENING_STEPS.map((_, i) => (
+          <div key={i} className={`${styles.progressDot} ${i <= step ? styles.progressDotActive : ''}`} />
+        ))}
       </div>
       <div className={styles.stepContent} key={step}>
-        <p className={styles.stepLabel}>{step + 1} of {DAILY_STEPS.length}</p>
+        <p className={styles.stepLabel}>{step + 1} of {EVENING_STEPS.length}</p>
         <h2 className={styles.stepQuestion}>{current.label}</h2>
         <p className={styles.stepPrompt}>{current.prompt}</p>
-        <div className="field">
-          <textarea autoFocus placeholder="Write freely…" value={answers[current.key] || ''} onChange={e => setAnswers(a => ({ ...a, [current.key]: e.target.value }))} rows={5} />
-        </div>
+        {current.key === 'energy' ? (
+          <EnergyPicker value={energy} onChange={setEnergy} />
+        ) : (
+          <div className="field">
+            <textarea autoFocus placeholder="Write freely…" value={answers[current.key] || ''} onChange={e => setAnswers(a => ({ ...a, [current.key]: e.target.value }))} rows={5} />
+          </div>
+        )}
       </div>
       <div className={styles.formActions}>
         {step > 0 && <button className="btn btn-secondary" onClick={() => setStep(s => s - 1)}>← Back</button>}
-        <button className="btn btn-primary" onClick={handleNext} disabled={!answers[current.key]?.trim()}>
+        <button className="btn btn-primary" onClick={handleNext} disabled={!isValid}>
           {isLast ? 'Save entry' : 'Next →'}
         </button>
       </div>
@@ -227,7 +259,10 @@ export default function NewEntry() {
     setSaving(true)
     const { error } = await createEntry(entryType, content)
     setSaving(false)
-    if (!error) { setSaved(true); setTimeout(() => navigate('/'), 1200) }
+    if (!error) {
+      setSaved(true)
+      setTimeout(() => navigate('/'), 1200)
+    }
   }
 
   if (saved) {
@@ -244,7 +279,7 @@ export default function NewEntry() {
     <div className={styles.page}>
       {saving && <div className={styles.savingOverlay}>Saving…</div>}
       {entryType === 'morning' && <MorningForm onSave={handleSave} />}
-      {entryType === 'daily' && <DailyForm onSave={handleSave} />}
+      {entryType === 'daily' && <EveningForm onSave={handleSave} />}
       {entryType === 'freewrite' && <FreewriteForm onSave={handleSave} />}
       {entryType === 'weekly' && <WeeklyForm onSave={handleSave} />}
     </div>

@@ -6,6 +6,7 @@ import AIReflection from '../components/AIReflection'
 import styles from './EntryDetail.module.css'
 
 const DAILY_LABELS: Record<string, string> = {
+  energy: 'Energy level',
   highlight: 'Highlight of the day',
   challenge: 'Challenge faced',
   decision: 'A decision I made',
@@ -48,7 +49,7 @@ export default function EntryDetail() {
     <div className={styles.page}>
       <div className={styles.header}>
         <span className={`tag tag-${entry.type}`}>
-          {entry.type === 'daily' ? 'Daily Check-in' : entry.type === 'freewrite' ? 'Free Write' : entry.type === 'morning' ? 'Morning' : 'Weekly Review'}
+          {entry.type === 'daily' ? 'Evening Check-in' : entry.type === 'freewrite' ? 'Free Write' : entry.type === 'morning' ? 'Morning Check-in' : 'Weekly Reflection'}
         </span>
         <h1 className={styles.date}>{format(new Date(entry.created_at), 'EEEE, d MMMM yyyy')}</h1>
         <p className={styles.time}>{format(new Date(entry.created_at), 'h:mm a')}</p>

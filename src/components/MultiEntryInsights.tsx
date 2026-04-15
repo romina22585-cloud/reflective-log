@@ -12,7 +12,7 @@ const DAYS_WINDOW = 14
 function serializeEntry(entry: Entry): string {
   const c = entry.content as Record<string, unknown>
   const date = format(new Date(entry.created_at), 'EEE d MMM')
-  const lines: string[] = [`[${date} — ${entry.type.toUpperCase()}]`]
+  const lines: string[] = [`[${date} — ${entry.type === 'daily' ? 'EVENING CHECK-IN' : entry.type === 'morning' ? 'MORNING CHECK-IN' : entry.type.toUpperCase()}]`]
   if (entry.type === 'morning') {
     if (c.energy) lines.push(`Energy: ${c.energy}/5`)
     if (c.gratitude) lines.push(`Gratitude: ${c.gratitude}`)

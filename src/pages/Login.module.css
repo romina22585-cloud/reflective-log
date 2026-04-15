@@ -95,3 +95,19 @@
   color: var(--ink-muted);
   letter-spacing: 0.06em;
 }
+
+.pending {
+  padding: 1rem;
+  background: rgba(107, 124, 92, 0.08);
+  border: 1px solid rgba(107, 124, 92, 0.25);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  color: var(--sage);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.pendingIcon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}

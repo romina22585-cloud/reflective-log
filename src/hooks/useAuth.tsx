@@ -7,7 +7,7 @@ interface AuthContextType {
   session: Session | null
   loading: boolean
   signIn: (email: string, password: string) => Promise<{ error: string | null }>
-  signUp: (email: string, password: string) => Promise<{ error: string | null }>
+  signUp: (email: string, password: string) => Promise<{ error: string | null; pending?: boolean }>
   signOut: () => Promise<void>
 }
 
@@ -34,13 +34,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    return { error: error?.message ?? null }
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) return { error: error.message }
+
+    // Check approval
+    if (data.user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_approved')
+        .eq('id', data.user.id)
+        .single()
+
+      if (profile && !profile.is_approved) {
+        await supabase.auth.signOut()
+        return { error: 'Your account is pending approval. You will be notified once access is granted.' }
+      }
+    }
+
+    return { error: null }
   }
 
   const signUp = async (email: string, password: string) => {
     const { error } = await supabase.auth.signUp({ email, password })
-    return { error: error?.message ?? null }
+    if (error) return { error: error.message }
+    // Profile auto-created by DB trigger with is_approved = false
+    return { error: null, pending: true }
   }
 
   const signOut = async () => {

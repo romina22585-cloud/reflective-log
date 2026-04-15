@@ -13,17 +13,15 @@ export default function Login() {
 
   const handleSubmit = async () => {
     if (!email || !password) { setError('Please fill in all fields.'); return }
-    setError('')
-    setMessage('')
-    setLoading(true)
+    setError(''); setMessage(''); setLoading(true)
 
     if (mode === 'signin') {
       const { error } = await signIn(email, password)
       if (error) setError(error)
     } else {
-      const { error } = await signUp(email, password)
+      const { error, pending } = await signUp(email, password)
       if (error) setError(error)
-      else setMessage('Account created! Check your email to confirm, then sign in.')
+      else if (pending) setMessage('Request received! The administrator will review your access. You\'ll be able to sign in once approved.')
     }
     setLoading(false)
   }
@@ -38,60 +36,52 @@ export default function Login() {
         <div className={styles.brand}>
           <span className={styles.mark}>◆</span>
           <h1 className={styles.title}>Reflective Log</h1>
-          <p className={styles.subtitle}>A space for growth, one entry at a time.</p>
+          <p className={styles.subtitle}>
+            {mode === 'signin' ? 'A space for growth, one entry at a time.' : 'Request access to begin your practice.'}
+          </p>
         </div>
 
         <div className={styles.form}>
           <div className="field">
             <label>Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="you@example.com"
-              autoComplete="email"
-            />
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={handleKeyDown} placeholder="you@example.com" autoComplete="email" />
           </div>
 
           <div className="field">
             <label>Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="••••••••"
-              autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
-            />
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={handleKeyDown} placeholder="••••••••" autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} />
           </div>
 
           {error && <p className={styles.error}>{error}</p>}
-          {message && <p className={styles.success}>{message}</p>}
+          {message && (
+            <div className={styles.pending}>
+              <p className={styles.pendingIcon}>⏳</p>
+              <p>{message}</p>
+            </div>
+          )}
 
-          <button
-            className={`btn btn-primary ${styles.submitBtn}`}
-            onClick={handleSubmit}
-            disabled={loading}
-          >
-            {loading ? 'Please wait…' : mode === 'signin' ? 'Sign In' : 'Create Account'}
-          </button>
+          {!message && (
+            <>
+              <button className={`btn btn-primary ${styles.submitBtn}`} onClick={handleSubmit} disabled={loading}>
+                {loading ? 'Please wait…' : mode === 'signin' ? 'Sign In' : 'Request Access'}
+              </button>
+              <div className="deco-line">or</div>
+              <button className={`btn btn-secondary ${styles.switchBtn}`} onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError(''); setMessage('') }}>
+                {mode === 'signin' ? 'Request access to this log' : 'Already have an account? Sign in'}
+              </button>
+            </>
+          )}
 
-          <div className="deco-line">or</div>
-
-          <button
-            className={`btn btn-secondary ${styles.switchBtn}`}
-            onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError(''); setMessage('') }}
-          >
-            {mode === 'signin' ? 'Create a new account' : 'Already have an account? Sign in'}
-          </button>
+          {message && (
+            <button className={`btn btn-secondary ${styles.switchBtn}`} onClick={() => { setMode('signin'); setMessage(''); setError('') }}>
+              Back to sign in
+            </button>
+          )}
         </div>
       </div>
 
       <div className={styles.quote}>
-        <blockquote>
-          "Without reflection, we go blindly on our way."
-        </blockquote>
+        <blockquote>"Without reflection, we go blindly on our way."</blockquote>
         <cite>— Margaret J. Wheatley</cite>
       </div>
     </div>

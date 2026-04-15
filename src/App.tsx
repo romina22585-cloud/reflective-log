@@ -4,6 +4,7 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import NewEntry from './pages/NewEntry'
 import EntryDetail from './pages/EntryDetail'
+import Settings from './pages/Settings'
 import Layout from './components/Layout'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -28,6 +29,7 @@ function AppRoutes() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/new/:type" element={<NewEntry />} />
         <Route path="/entry/:id" element={<EntryDetail />} />
+        <Route path="/settings" element={<Settings />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

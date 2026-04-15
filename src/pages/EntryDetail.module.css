@@ -71,3 +71,79 @@
   text-align: center;
   color: var(--ink-muted);
 }
+
+/* Energy display */
+.energyDisplay {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
+}
+
+.energyDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--parchment-deeper);
+}
+
+.energyDotFilled {
+  background: var(--gold);
+}
+
+.energyText {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  margin-left: 0.3rem;
+  letter-spacing: 0.04em;
+}
+
+/* Pinned articles */
+.pinnedArticles {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pinnedLabel {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 0.25rem;
+}
+
+.pinnedCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--parchment);
+  border: 1px solid var(--parchment-deeper);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  transition: all 150ms ease;
+}
+
+.pinnedCard:hover {
+  border-color: var(--gold);
+  background: rgba(201, 150, 58, 0.05);
+}
+
+.pinnedTitle {
+  font-size: 0.875rem;
+  color: var(--ink-soft);
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.pinnedArrow {
+  color: var(--gold);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}

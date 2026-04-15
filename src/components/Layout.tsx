@@ -1,16 +1,12 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
+import { useProfile } from '../hooks/useProfile'
 import styles from './Layout.module.css'
 
 export default function Layout() {
-  const { user, signOut } = useAuth()
+  const { displayName } = useProfile()
   const navigate = useNavigate()
   const location = useLocation()
-
-  const handleSignOut = async () => {
-    await signOut()
-    navigate('/login')
-  }
+  const isHome = location.pathname === '/'
 
   return (
     <div className={styles.wrapper}>
@@ -20,14 +16,12 @@ export default function Layout() {
           <span className={styles.logoText}>Reflective Log</span>
         </button>
         <div className={styles.headerRight}>
-          {location.pathname !== '/' && (
-            <button className="btn btn-ghost" onClick={() => navigate('/')}>
-              ← Back
-            </button>
+          {!isHome && (
+            <button className="btn btn-ghost" onClick={() => navigate('/')}>← Back</button>
           )}
-          <span className={styles.userEmail}>{user?.email?.split('@')[0]}</span>
-          <button className="btn btn-ghost" onClick={handleSignOut}>
-            Sign out
+          <button className={styles.userBtn} onClick={() => navigate('/settings')} title="Settings">
+            <span className={styles.userAvatar}>{displayName.charAt(0).toUpperCase()}</span>
+            <span className={styles.userName}>{displayName}</span>
           </button>
         </div>
       </header>

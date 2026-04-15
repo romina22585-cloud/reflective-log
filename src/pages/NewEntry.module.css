@@ -176,3 +176,106 @@
   animation: fadeIn 0.2s ease forwards;
   z-index: 200;
 }
+
+/* Energy picker */
+.energyPicker {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.energyBtn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem 0.4rem;
+  background: white;
+  border: 1.5px solid var(--parchment-deeper);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.energyBtn:hover { border-color: var(--gold-light); }
+.energyActive { border-color: var(--gold) !important; background: rgba(201, 150, 58, 0.08) !important; }
+
+.energyNum {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 300;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.energyLabel {
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+/* Article pinner */
+.articlePinner {
+  border: 1px solid var(--parchment-deeper);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  background: var(--parchment);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.articlePinnerLabel {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.articlePinnerInput {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.articlePinnerInput input {
+  flex: 1;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--parchment-deeper);
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  background: white;
+  color: var(--ink);
+}
+
+.articlePinnerInput input:focus { outline: none; border-color: var(--gold); }
+.articleError { font-size: 0.78rem; color: var(--ink-muted); font-style: italic; }
+
+.articleList { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.articleCard {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  background: white;
+  border: 1px solid var(--parchment-deeper);
+  border-radius: var(--radius);
+}
+
+.articleTitle {
+  flex: 1;
+  font-size: 0.825rem;
+  color: var(--ink-soft);
+  text-decoration: none;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.articleTitle:hover { color: var(--gold); text-decoration: underline; }
+.articleRemove { background: none; border: none; color: var(--ink-muted); cursor: pointer; font-size: 0.65rem; padding: 0.2rem; flex-shrink: 0; }
+.articleRemove:hover { color: var(--rust); }

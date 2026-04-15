@@ -21,8 +21,7 @@ export const DEFAULT_HABITS = [
   { name: 'FIIT class (25-40 min)', emoji: '🏋️', is_default: true, sort_order: 13 },
 ]
 
-// Names that belong to the OLD default set — if user only has these, auto-migrate
-const OLD_DEFAULT_NAMES = ['Exercise / movement', 'Sleep quality', 'No alcohol', 'Meditation']
+const NEW_HABIT_NAMES = DEFAULT_HABITS.map(h => h.name)
 
 function getTodayStr() {
   return format(new Date(), 'yyyy-MM-dd')
@@ -44,9 +43,7 @@ export function useHabits() {
         fetchLogs()
       }
     }, 60_000)
-    return () => {
-      if (dateCheckRef.current) clearInterval(dateCheckRef.current)
-    }
+    return () => { if (dateCheckRef.current) clearInterval(dateCheckRef.current) }
   }, [today])
 
   useEffect(() => {
@@ -55,19 +52,17 @@ export function useHabits() {
 
   const fetchLogs = async () => {
     const thirtyDaysAgo = format(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd')
-    const { data } = await supabase
-      .from('habit_logs')
-      .select('*')
-      .gte('logged_date', thirtyDaysAgo)
+    const { data } = await supabase.from('habit_logs').select('*').gte('logged_date', thirtyDaysAgo)
     setLogs(data || [])
   }
 
   const seedDefaults = async () => {
-    await supabase.from('habits').delete().neq('id', '00000000-0000-0000-0000-000000000000')
-    await supabase.from('habits').insert(
+    // Delete all existing habits for this user
+    await supabase.from('habits').delete().eq('user_id', user!.id)
+    // Insert the new defaults
+    const { data } = await supabase.from('habits').insert(
       DEFAULT_HABITS.map(h => ({ ...h, user_id: user!.id }))
-    )
-    const { data } = await supabase.from('habits').select('*').order('sort_order')
+    ).select()
     setHabits(data || [])
   }
 
@@ -76,15 +71,16 @@ export function useHabits() {
     const { data: existing } = await supabase
       .from('habits')
       .select('*')
+      .eq('user_id', user!.id)
       .order('sort_order')
 
     if (!existing || existing.length === 0) {
-      // No habits at all — seed defaults
+      // No habits — seed defaults
       await seedDefaults()
     } else {
-      // Check if user only has old defaults — auto-migrate
-      const allOld = existing.every((h: Habit) => OLD_DEFAULT_NAMES.includes(h.name))
-      if (allOld) {
+      // Check if user has the new habits — if none of their habits match new names, migrate
+      const hasNewHabits = existing.some((h: Habit) => NEW_HABIT_NAMES.includes(h.name))
+      if (!hasNewHabits) {
         await seedDefaults()
       } else {
         setHabits(existing)
@@ -103,9 +99,7 @@ export function useHabits() {
       setLogs(prev => prev.filter(l => l.id !== existing.id))
     } else {
       const { data } = await supabase.from('habit_logs').insert([{
-        habit_id: habitId,
-        user_id: user!.id,
-        logged_date: currentToday,
+        habit_id: habitId, user_id: user!.id, logged_date: currentToday,
       }]).select().single()
       if (data) setLogs(prev => [...prev, data])
     }
@@ -128,10 +122,8 @@ export function useHabits() {
     await seedDefaults()
   }
 
-  const isCompletedToday = (habitId: string) => {
-    const currentToday = getTodayStr()
-    return logs.some(l => l.habit_id === habitId && l.logged_date === currentToday)
-  }
+  const isCompletedToday = (habitId: string) =>
+    logs.some(l => l.habit_id === habitId && l.logged_date === getTodayStr())
 
   const getStreak = (habitId: string): number => {
     let streak = 0

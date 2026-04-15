@@ -4,7 +4,6 @@ import { useEntries } from '../hooks/useEntries'
 import { EntryType, DailyContent, FreewriteContent, WeeklyContent, MorningContent, Article } from '../types'
 import styles from './NewEntry.module.css'
 
-// Evening Check-in (was Daily) — now includes energy level as first step
 const EVENING_STEPS = [
   { key: 'energy', label: 'Energy level', prompt: 'How is your energy right now at the end of the day?' },
   { key: 'highlight', label: 'Highlight of today', prompt: 'What was the most meaningful moment or achievement today — however small?' },
@@ -33,7 +32,7 @@ function EnergyPicker({ value, onChange }: { value: number; onChange: (n: number
   return (
     <div className={styles.energyPicker}>
       {[1, 2, 3, 4, 5].map(n => (
-        <button key={n} className={`${styles.energyBtn} ${value === n ? styles.energyActive : ''}`} onClick={() => onChange(n)}>
+        <button key={n} type="button" className={`${styles.energyBtn} ${value === n ? styles.energyActive : ''}`} onClick={() => onChange(n)}>
           <span className={styles.energyNum}>{n}</span>
           <span className={styles.energyLabel}>{['Low', 'Tired', 'Ok', 'Good', 'Great'][n - 1]}</span>
         </button>
@@ -48,7 +47,9 @@ function MorningForm({ onSave }: { onSave: (content: MorningContent) => void }) 
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const current = MORNING_STEPS[step]
   const isLast = step === MORNING_STEPS.length - 1
-  const isValid = current.key === 'energy' ? energy > 0 : !!(answers[current.key]?.trim())
+
+  const currentValue = current.key === 'energy' ? energy : (answers[current.key] || '')
+  const isValid = current.key === 'energy' ? energy > 0 : String(currentValue).trim().length > 0
 
   const handleNext = () => {
     if (!isValid) return
@@ -79,13 +80,19 @@ function MorningForm({ onSave }: { onSave: (content: MorningContent) => void }) 
           <EnergyPicker value={energy} onChange={setEnergy} />
         ) : (
           <div className="field">
-            <textarea autoFocus placeholder="Write freely…" value={answers[current.key] || ''} onChange={e => setAnswers(a => ({ ...a, [current.key]: e.target.value }))} rows={4} />
+            <textarea
+              autoFocus
+              placeholder="Write freely…"
+              value={answers[current.key] || ''}
+              onChange={e => setAnswers(a => ({ ...a, [current.key]: e.target.value }))}
+              rows={4}
+            />
           </div>
         )}
       </div>
       <div className={styles.formActions}>
-        {step > 0 && <button className="btn btn-secondary" onClick={() => setStep(s => s - 1)}>← Back</button>}
-        <button className="btn btn-primary" onClick={handleNext} disabled={!isValid}>
+        {step > 0 && <button type="button" className="btn btn-secondary" onClick={() => setStep(s => s - 1)}>← Back</button>}
+        <button type="button" className="btn btn-primary" onClick={handleNext} disabled={!isValid}>
           {isLast ? 'Save entry' : 'Next →'}
         </button>
       </div>
@@ -137,8 +144,8 @@ function EveningForm({ onSave }: { onSave: (content: DailyContent) => void }) {
         )}
       </div>
       <div className={styles.formActions}>
-        {step > 0 && <button className="btn btn-secondary" onClick={() => setStep(s => s - 1)}>← Back</button>}
-        <button className="btn btn-primary" onClick={handleNext} disabled={!isValid}>
+        {step > 0 && <button type="button" className="btn btn-secondary" onClick={() => setStep(s => s - 1)}>← Back</button>}
+        <button type="button" className="btn btn-primary" onClick={handleNext} disabled={!isValid}>
           {isLast ? 'Save entry' : 'Next →'}
         </button>
       </div>
@@ -175,7 +182,7 @@ function ArticlePinner({ articles, onAdd, onRemove }: { articles: Article[]; onA
       <p className={styles.articlePinnerLabel}>📎 Pin an article</p>
       <div className={styles.articlePinnerInput}>
         <input type="url" placeholder="Paste article URL…" value={url} onChange={e => setUrl(e.target.value)} onKeyDown={e => e.key === 'Enter' && fetchTitle()} />
-        <button className="btn btn-secondary" onClick={fetchTitle} disabled={!url.trim() || fetching}>{fetching ? '…' : 'Add'}</button>
+        <button type="button" className="btn btn-secondary" onClick={fetchTitle} disabled={!url.trim() || fetching}>{fetching ? '…' : 'Add'}</button>
       </div>
       {error && <p className={styles.articleError}>{error}</p>}
       {articles.length > 0 && (
@@ -183,7 +190,7 @@ function ArticlePinner({ articles, onAdd, onRemove }: { articles: Article[]; onA
           {articles.map(a => (
             <div key={a.url} className={styles.articleCard}>
               <a href={a.url} target="_blank" rel="noopener noreferrer" className={styles.articleTitle}>{a.title}</a>
-              <button className={styles.articleRemove} onClick={() => onRemove(a.url)}>✕</button>
+              <button type="button" className={styles.articleRemove} onClick={() => onRemove(a.url)}>✕</button>
             </div>
           ))}
         </div>
@@ -208,7 +215,7 @@ function FreewriteForm({ onSave }: { onSave: (content: FreewriteContent) => void
       </div>
       <ArticlePinner articles={articles} onAdd={a => setArticles(p => [...p, a])} onRemove={url => setArticles(p => p.filter(a => a.url !== url))} />
       <div className={styles.formActions}>
-        <button className="btn btn-primary" onClick={() => onSave({ text, articles })} disabled={!text.trim() && articles.length === 0}>Save entry</button>
+        <button type="button" className="btn btn-primary" onClick={() => onSave({ text, articles })} disabled={!text.trim() && articles.length === 0}>Save entry</button>
       </div>
     </div>
   )
@@ -222,7 +229,7 @@ function WeeklyForm({ onSave }: { onSave: (content: WeeklyContent) => void }) {
   return (
     <div className={styles.form}>
       <div className={styles.stepContent}>
-        <h2 className={styles.stepQuestion}>Weekly review</h2>
+        <h2 className={styles.stepQuestion}>Weekly reflection</h2>
         <p className={styles.stepPrompt}>Take 15 minutes to reflect on your week as a whole.</p>
       </div>
       {WEEKLY_FIELDS.map(field => (
@@ -236,12 +243,12 @@ function WeeklyForm({ onSave }: { onSave: (content: WeeklyContent) => void }) {
         <p className={styles.ratingLabel}>How was this week overall?</p>
         <div className={styles.ratingStars}>
           {[1, 2, 3, 4, 5].map(n => (
-            <button key={n} className={`${styles.star} ${n <= rating ? styles.starActive : ''}`} onClick={() => setRating(n)}>★</button>
+            <button type="button" key={n} className={`${styles.star} ${n <= rating ? styles.starActive : ''}`} onClick={() => setRating(n)}>★</button>
           ))}
         </div>
       </div>
       <div className={styles.formActions}>
-        <button className="btn btn-primary" onClick={() => onSave({ ...answers, rating } as unknown as WeeklyContent)} disabled={!allFilled}>Save weekly review</button>
+        <button type="button" className="btn btn-primary" onClick={() => onSave({ ...answers, rating } as unknown as WeeklyContent)} disabled={!allFilled}>Save weekly reflection</button>
       </div>
     </div>
   )
@@ -253,15 +260,19 @@ export default function NewEntry() {
   const { createEntry } = useEntries()
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const entryType = (type as EntryType) || 'daily'
 
   const handleSave = async (content: DailyContent | FreewriteContent | WeeklyContent | MorningContent) => {
     setSaving(true)
+    setSaveError('')
     const { error } = await createEntry(entryType, content)
     setSaving(false)
     if (!error) {
       setSaved(true)
       setTimeout(() => navigate('/'), 1200)
+    } else {
+      setSaveError('Could not save. Please try again.')
     }
   }
 
@@ -278,6 +289,7 @@ export default function NewEntry() {
   return (
     <div className={styles.page}>
       {saving && <div className={styles.savingOverlay}>Saving…</div>}
+      {saveError && <p style={{ color: 'var(--rust)', fontSize: '0.85rem', marginBottom: '1rem' }}>{saveError}</p>}
       {entryType === 'morning' && <MorningForm onSave={handleSave} />}
       {entryType === 'daily' && <EveningForm onSave={handleSave} />}
       {entryType === 'freewrite' && <FreewriteForm onSave={handleSave} />}

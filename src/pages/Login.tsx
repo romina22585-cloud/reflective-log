@@ -35,7 +35,7 @@ export default function Login() {
       <div className={styles.panel}>
         <div className={styles.brand}>
           <span className={styles.mark}>◆</span>
-          <h1 className={styles.title}>In Bloom</h1>
+          <h1 className={styles.title}>IN BLOOM</h1>
           <p className={styles.subtitle}>
             {mode === 'signin' ? 'A space for growth, one entry at a time.' : 'Request access to begin your practice.'}
           </p>

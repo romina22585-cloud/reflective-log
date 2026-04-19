@@ -296,3 +296,20 @@
   font-weight: 500;
   box-shadow: 0 1px 3px rgba(26,18,8,0.1);
 }
+
+/* Groups */
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.groupLabel {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid var(--parchment-deeper);
+  margin-bottom: 0.2rem;
+}

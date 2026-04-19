@@ -1,0 +1,107 @@
+.wrapper {
+  border: 1px solid;
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  animation: fadeUp 0.3s ease forwards;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.statusLeft {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  flex: 1;
+}
+
+.statusEmoji {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.statusLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.2rem;
+  letter-spacing: 0.02em;
+}
+
+.statusMessage {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.lights {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.light {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  transition: background 300ms ease;
+}
+
+.lightActive {
+  box-shadow: 0 0 6px currentColor;
+}
+
+/* Progress bars */
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.barGroup {}
+
+.barLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+  font-size: 0.7rem;
+  color: var(--ink-muted);
+  letter-spacing: 0.04em;
+}
+
+.barTrack {
+  height: 6px;
+  background: var(--parchment-deeper);
+  border-radius: 3px;
+  position: relative;
+  overflow: visible;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 600ms ease;
+  min-width: 0;
+}
+
+.barMarker {
+  position: absolute;
+  top: -3px;
+  width: 2px;
+  height: 12px;
+  background: white;
+  border-radius: 1px;
+  transform: translateX(-50%);
+  opacity: 0.8;
+}

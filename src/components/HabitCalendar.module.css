@@ -1,0 +1,199 @@
+.calendar {
+  background: white;
+  border: 1px solid var(--parchment-deeper);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Habit emoji tabs */
+.habitTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.habitTab {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--parchment-deeper);
+  background: var(--parchment);
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 150ms ease;
+}
+
+.habitTab:hover {
+  border-color: var(--gold-light);
+  background: white;
+}
+
+.habitTabActive {
+  border-color: var(--rust) !important;
+  background: rgba(160, 82, 45, 0.08) !important;
+}
+
+/* Selected habit header */
+.habitTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--parchment);
+}
+
+.habitTitleEmoji { font-size: 1.1rem; }
+
+.habitTitleName {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  flex: 1;
+}
+
+.habitTitleRate {
+  font-size: 0.72rem;
+  color: var(--rust);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+/* Weekly strip */
+.weekStrip {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+  text-align: center;
+}
+
+.weekDay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.weekDayLabel {
+  font-size: 0.65rem;
+  color: var(--ink-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.weekDayNum {
+  font-size: 0.68rem;
+  color: var(--ink-muted);
+}
+
+.weekDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--parchment-deeper);
+  transition: background 150ms ease;
+}
+
+.weekDotDone { background: var(--sage) !important; }
+.weekDotToday { outline: 2px solid var(--gold); outline-offset: 1px; }
+
+/* Month navigation */
+.monthNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.monthLabel {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+}
+
+.navBtn {
+  background: none;
+  border: 1px solid var(--parchment-deeper);
+  border-radius: var(--radius);
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.navBtn:hover:not(:disabled) {
+  border-color: var(--gold-light);
+  color: var(--ink);
+}
+
+.navBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Monthly grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.gridHeader {
+  text-align: center;
+  font-size: 0.62rem;
+  color: var(--ink-muted);
+  letter-spacing: 0.06em;
+  padding-bottom: 0.3rem;
+  font-weight: 500;
+}
+
+.gridDay {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  border-radius: var(--radius);
+  position: relative;
+  gap: 1px;
+}
+
+.gridDayDone {
+  background: rgba(107, 124, 92, 0.15);
+  color: var(--sage);
+  font-weight: 500;
+}
+
+.gridDayToday {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.gridDayFuture { opacity: 0.3; }
+.gridDayOther { opacity: 0.2; }
+
+.gridDot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--sage);
+}
+
+/* Empty state */
+.selectHint {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  font-style: italic;
+  padding: 1rem 0;
+}

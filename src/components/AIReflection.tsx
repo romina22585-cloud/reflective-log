@@ -53,6 +53,8 @@ export default function AIReflection({ entry }: Props) {
 
   const askClaude = async () => {
     setLoading(true)
+    const apiKey = import.meta.env.VITE_CLAUDE_API_KEY
+    if (!apiKey) { setResponse('API key not configured. Add VITE_CLAUDE_API_KEY to GitHub secrets and redeploy.'); setLoading(false); return }
     setShown(true)
     setSaved(false)
     try {
@@ -60,7 +62,7 @@ export default function AIReflection({ entry }: Props) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-api-key': import.meta.env.VITE_CLAUDE_API_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-5',
+          model: 'claude-haiku-4-5',
           max_tokens: 1000,
           messages: [{ role: 'user', content: buildPrompt(entry) }],
         }),

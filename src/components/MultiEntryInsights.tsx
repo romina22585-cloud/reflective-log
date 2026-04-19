@@ -47,7 +47,7 @@ ${serialized}
 Respond with exactly three sections using these headers:
 
 **Patterns I notice**
-Identify 2–3 recurring themes, emotions, or situations across these entries.
+Identify 2-3 recurring themes, emotions, or situations across these entries.
 
 **Something you may not have seen**
 One observation the person is unlikely to have noticed — a blind spot, shift, or quietly significant detail.
@@ -82,6 +82,7 @@ export default function MultiEntryInsights({ entries }: Props) {
   const [shown, setShown] = useState(false)
   const [dismissed, setDismissed] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [errorDetail, setErrorDetail] = useState('')
   const { reflections, saveReflection, deleteReflection } = useSavedReflections()
 
   const multiReflections = reflections.filter(r => r.type === 'multi')
@@ -92,26 +93,59 @@ export default function MultiEntryInsights({ entries }: Props) {
     .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
 
   const hasEnough = recentEntries.length >= MIN_ENTRIES
+  const apiKey = import.meta.env.VITE_CLAUDE_API_KEY
 
   const analyse = async () => {
     setLoading(true)
     setShown(true)
     setSaved(false)
+    setErrorDetail('')
+
+    if (!apiKey) {
+      setResponse([{ title: 'Setup needed', content: 'Claude API key is not configured. Please add VITE_CLAUDE_API_KEY to your GitHub secrets and redeploy.' }])
+      setLoading(false)
+      return
+    }
+
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': import.meta.env.VITE_CLAUDE_API_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-5',
+          model: 'claude-haiku-4-5',
           max_tokens: 1000,
           messages: [{ role: 'user', content: buildPrompt(recentEntries) }],
         }),
       })
+
       const data = await res.json()
-      const text = data.content?.map((b: { type: string; text?: string }) => b.type === 'text' ? b.text : '').join('') || ''
-      setResponse(parseResponse(text))
-    } catch {
-      setResponse([{ title: 'Error', content: 'Unable to connect right now. Please try again.' }])
+
+      if (!res.ok) {
+        const msg = data?.error?.message || `HTTP ${res.status}`
+        setErrorDetail(msg)
+        setResponse([{ title: 'Error', content: `Could not connect: ${msg}` }])
+        setLoading(false)
+        return
+      }
+
+      const text = data.content
+        ?.map((b: { type: string; text?: string }) => b.type === 'text' ? b.text : '')
+        .join('') || ''
+
+      if (!text) {
+        setResponse([{ title: 'Error', content: 'Received an empty response. Please try again.' }])
+      } else {
+        setResponse(parseResponse(text))
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Unknown error'
+      setErrorDetail(msg)
+      setResponse([{ title: 'Error', content: `Connection failed: ${msg}` }])
     }
     setLoading(false)
   }
@@ -126,7 +160,6 @@ export default function MultiEntryInsights({ entries }: Props) {
 
   return (
     <div className={styles.wrapper}>
-      {/* Past saved multi-insights */}
       {multiReflections.length > 0 && (
         <div className={styles.savedList}>
           <p className={styles.savedListTitle}>◈ Saved insights</p>
@@ -151,7 +184,7 @@ export default function MultiEntryInsights({ entries }: Props) {
                   <span className={styles.triggerSub}>
                     {hasEnough
                       ? `${recentEntries.length} entries · last ${DAYS_WINDOW} days`
-                      : `Write ${MIN_ENTRIES - recentEntries.length} more entr${MIN_ENTRIES - recentEntries.length === 1 ? 'y' : 'ies'} to unlock`}
+                      : `You need ${MIN_ENTRIES - recentEntries.length} more entr${MIN_ENTRIES - recentEntries.length === 1 ? 'y' : 'ies'} to unlock insights`}
                   </span>
                 </span>
               </span>

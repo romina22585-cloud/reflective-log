@@ -13,12 +13,14 @@ function buildPrompt(entry: Entry): string {
   const c = entry.content as Record<string, unknown>
 
   if (entry.type === 'daily') {
+    if (c.energy) lines.push(`Energy: ${c.energy}/5`)
     if (c.highlight) lines.push(`Highlight: ${c.highlight}`)
     if (c.challenge) lines.push(`Challenge: ${c.challenge}`)
     if (c.decision) lines.push(`Decision: ${c.decision}`)
     if (c.emotion) lines.push(`Emotion: ${c.emotion}`)
     if (c.tomorrow) lines.push(`Intention: ${c.tomorrow}`)
   } else if (entry.type === 'morning') {
+    if (c.energy) lines.push(`Energy: ${c.energy}/5`)
     if (c.gratitude) lines.push(`Gratitude: ${c.gratitude}`)
     if (c.intention) lines.push(`Intention: ${c.intention}`)
     if (c.lookingForward) lines.push(`Looking forward to: ${c.lookingForward}`)
@@ -31,17 +33,17 @@ function buildPrompt(entry: Entry): string {
     if (c.learned) lines.push(`Learned: ${c.learned}`)
   }
 
-  return `You are a thoughtful executive coach and reflective practice guide. A professional has shared this journal entry with you:
+  return `You are a thoughtful executive coach. A professional has shared this journal entry:
 
 ---
 ${lines.join('\n')}
 ---
 
-Your role is to help them go deeper. Respond with:
-1. One genuine observation about what stands out — something they may not have noticed themselves
-2. One powerful open question that would help them reflect further
+Respond with:
+1. One genuine observation about what stands out
+2. One powerful open question to reflect further
 
-Keep your response warm, concise, and focused. Do not give advice or solutions — only reflection and curiosity. Maximum 150 words.`
+Warm, concise, no advice. Maximum 150 words.`
 }
 
 export default function AIReflection({ entry }: Props) {
@@ -52,26 +54,49 @@ export default function AIReflection({ entry }: Props) {
   const { reflections, saveReflection, deleteReflection } = useSavedReflections(entry.id)
 
   const askClaude = async () => {
-    setLoading(true)
-    const apiKey = import.meta.env.VITE_CLAUDE_API_KEY
-    if (!apiKey) { setResponse('API key not configured. Add VITE_CLAUDE_API_KEY to GitHub secrets and redeploy.'); setLoading(false); return }
     setShown(true)
+    setLoading(true)
     setSaved(false)
+
+    const apiKey = import.meta.env.VITE_CLAUDE_API_KEY
+
+    if (!apiKey) {
+      setResponse('⚠️ API key not configured. Add VITE_CLAUDE_API_KEY to GitHub secrets and redeploy.')
+      setLoading(false)
+      return
+    }
+
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': import.meta.env.VITE_CLAUDE_API_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
         body: JSON.stringify({
-          model: 'claude-haiku-4-5',
+          model: 'claude-haiku-4-5-20251001',
           max_tokens: 1000,
           messages: [{ role: 'user', content: buildPrompt(entry) }],
         }),
       })
+
       const data = await res.json()
-      const text = data.content?.map((b: { type: string; text?: string }) => b.type === 'text' ? b.text : '').join('') || 'No response received.'
-      setResponse(text)
-    } catch {
-      setResponse('Unable to connect to Claude right now. Please try again.')
+
+      if (!res.ok) {
+        setResponse(`⚠️ API error ${res.status}: ${data?.error?.message || 'Unknown error'}`)
+        setLoading(false)
+        return
+      }
+
+      const text = data.content
+        ?.map((b: { type: string; text?: string }) => b.type === 'text' ? b.text : '')
+        .join('') || ''
+
+      setResponse(text || 'No response received.')
+    } catch (err) {
+      setResponse(`⚠️ Connection failed: ${err instanceof Error ? err.message : 'Unknown error'}`)
     }
     setLoading(false)
   }
@@ -83,7 +108,6 @@ export default function AIReflection({ entry }: Props) {
 
   return (
     <div>
-      {/* Past saved reflections */}
       {reflections.length > 0 && (
         <div className={styles.savedList}>
           <p className={styles.savedListTitle}>✦ Saved reflections</p>
@@ -119,9 +143,7 @@ export default function AIReflection({ entry }: Props) {
               <p className={styles.response}>{response}</p>
               <div className={styles.actions}>
                 {!saved ? (
-                  <button className={styles.saveBtn} onClick={handleSave}>
-                    ↓ Save this reflection
-                  </button>
+                  <button className={styles.saveBtn} onClick={handleSave}>↓ Save this reflection</button>
                 ) : (
                   <span className={styles.savedConfirm}>✓ Saved</span>
                 )}

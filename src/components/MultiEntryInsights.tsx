@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Entry } from '../types'
 import { format, subDays } from 'date-fns'
 import { useSavedReflections } from '../hooks/useSavedReflections'
+import { getClaudeApiKey } from '../lib/claudeKey'
 import styles from './MultiEntryInsights.module.css'
 
 interface Props { entries: Entry[] }
@@ -38,19 +39,17 @@ function serializeEntry(entry: Entry): string {
 
 function buildPrompt(entries: Entry[]): string {
   const serialized = entries.map(serializeEntry).join('\n\n')
-  return `You are a thoughtful executive coach and reflective practice guide. A professional has been keeping a reflective journal and has shared their entries from the past ${DAYS_WINDOW} days:
-
+  return `You are a thoughtful executive coach. A professional shared their journal entries from the past ${DAYS_WINDOW} days:
 ---
 ${serialized}
 ---
-
-Respond with exactly three sections using these headers:
+Respond with exactly three sections:
 
 **Patterns I notice**
-Identify 2-3 recurring themes, emotions, or situations across these entries.
+2-3 recurring themes, emotions, or situations across these entries.
 
 **Something you may not have seen**
-One observation the person is unlikely to have noticed — a blind spot, shift, or quietly significant detail.
+One observation the person is unlikely to have noticed themselves.
 
 **A question to sit with**
 One open, unhurried question. An invitation, not a challenge.
@@ -82,9 +81,7 @@ export default function MultiEntryInsights({ entries }: Props) {
   const [shown, setShown] = useState(false)
   const [dismissed, setDismissed] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [errorDetail, setErrorDetail] = useState('')
   const { reflections, saveReflection, deleteReflection } = useSavedReflections()
-
   const multiReflections = reflections.filter(r => r.type === 'multi')
 
   const cutoff = subDays(new Date(), DAYS_WINDOW)
@@ -93,16 +90,15 @@ export default function MultiEntryInsights({ entries }: Props) {
     .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
 
   const hasEnough = recentEntries.length >= MIN_ENTRIES
-  const apiKey = import.meta.env.VITE_CLAUDE_API_KEY
 
   const analyse = async () => {
     setLoading(true)
     setShown(true)
     setSaved(false)
-    setErrorDetail('')
 
+    const apiKey = await getClaudeApiKey()
     if (!apiKey) {
-      setResponse([{ title: 'Setup needed', content: 'Claude API key is not configured. Please add VITE_CLAUDE_API_KEY to your GitHub secrets and redeploy.' }])
+      setResponse([{ title: 'Setup needed', content: 'API key not found in Supabase or environment.' }])
       setLoading(false)
       return
     }
@@ -122,30 +118,16 @@ export default function MultiEntryInsights({ entries }: Props) {
           messages: [{ role: 'user', content: buildPrompt(recentEntries) }],
         }),
       })
-
       const data = await res.json()
-
       if (!res.ok) {
-        const msg = data?.error?.message || `HTTP ${res.status}`
-        setErrorDetail(msg)
-        setResponse([{ title: 'Error', content: `Could not connect: ${msg}` }])
+        setResponse([{ title: 'Error', content: `API error ${res.status}: ${data?.error?.message || 'Unknown'}` }])
         setLoading(false)
         return
       }
-
-      const text = data.content
-        ?.map((b: { type: string; text?: string }) => b.type === 'text' ? b.text : '')
-        .join('') || ''
-
-      if (!text) {
-        setResponse([{ title: 'Error', content: 'Received an empty response. Please try again.' }])
-      } else {
-        setResponse(parseResponse(text))
-      }
+      const text = data.content?.map((b: { type: string; text?: string }) => b.type === 'text' ? b.text : '').join('') || ''
+      setResponse(text ? parseResponse(text) : [{ title: 'Error', content: 'Empty response received.' }])
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Unknown error'
-      setErrorDetail(msg)
-      setResponse([{ title: 'Error', content: `Connection failed: ${msg}` }])
+      setResponse([{ title: 'Error', content: `Connection failed: ${err instanceof Error ? err.message : 'Unknown'}` }])
     }
     setLoading(false)
   }
@@ -202,7 +184,6 @@ export default function MultiEntryInsights({ entries }: Props) {
                 </div>
                 <button className={styles.dismissBtn} onClick={() => setDismissed(true)}>✕</button>
               </div>
-
               {loading ? (
                 <div className={styles.loadingState}>
                   <div className={styles.loadingDots}><span /><span /><span /></div>

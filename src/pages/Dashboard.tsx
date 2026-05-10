@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useEntries } from '../hooks/useEntries'
 import { format, isToday, isThisWeek } from 'date-fns'
@@ -24,6 +24,76 @@ function getPreview(entry: Entry): string {
   if (entry.type === 'freewrite') return (c.text as string) || ''
   if (entry.type === 'weekly') return (c.wins as string) || ''
   return ''
+}
+
+
+// ── Grouped entries by month ──────────────────────────────────
+function GroupedEntries({ entries, onNavigate, onDelete, typeLabels, getPreview }: {
+  entries: Entry[]
+  onNavigate: (id: string) => void
+  onDelete: (id: string, e: React.MouseEvent) => void
+  typeLabels: Record<string, string>
+  getPreview: (e: Entry) => string
+}) {
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
+
+  // Group by month key e.g. "May 2026"
+  const grouped = useMemo(() => {
+    const map: Record<string, Entry[]> = {}
+    for (const entry of entries) {
+      const key = format(new Date(entry.created_at), 'MMMM yyyy')
+      if (!map[key]) map[key] = []
+      map[key].push(entry)
+    }
+    return map
+  }, [entries])
+
+  const monthKeys = Object.keys(grouped)
+
+  const toggleMonth = (key: string) => {
+    setCollapsed(prev => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  return (
+    <div>
+      {monthKeys.map((monthKey, mi) => {
+        const isOpen = !collapsed[monthKey] // open by default
+        const monthEntries = grouped[monthKey]
+        return (
+          <div key={monthKey} className={styles.monthGroup}>
+            <button
+              className={styles.monthHeader}
+              onClick={() => toggleMonth(monthKey)}
+            >
+              <span className={styles.monthLabel}>{monthKey}</span>
+              <span className={styles.monthMeta}>{monthEntries.length} {monthEntries.length === 1 ? 'entry' : 'entries'}</span>
+              <span className={styles.monthChevron}>{isOpen ? '▲' : '▼'}</span>
+            </button>
+
+            {isOpen && (
+              <div className={styles.monthEntries}>
+                {monthEntries.map((entry, i) => (
+                  <div
+                    key={entry.id}
+                    className={styles.entryRow}
+                    style={{ animationDelay: `${i * 30}ms` }}
+                    onClick={() => onNavigate(entry.id)}
+                  >
+                    <div className={styles.entryMeta}>
+                      <span className={`tag tag-${entry.type}`}>{typeLabels[entry.type]}</span>
+                      <span className={styles.entryDate}>{format(new Date(entry.created_at), 'd MMM')}</span>
+                    </div>
+                    <p className={styles.entryPreview}>{getPreview(entry)}</p>
+                    <button className={styles.deleteBtn} onClick={(e) => onDelete(entry.id, e)} title="Delete entry">✕</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
 }
 
 type Tab = 'habits' | 'journal' | 'travel' | null
@@ -163,18 +233,13 @@ export default function Dashboard() {
             )}
 
             {!loading && filtered.length > 0 && (
-              <div className={styles.entryList}>
-                {filtered.map((entry, i) => (
-                  <div key={entry.id} className={styles.entryRow} style={{ animationDelay: `${i * 40}ms` }} onClick={() => navigate(`/entry/${entry.id}`)}>
-                    <div className={styles.entryMeta}>
-                      <span className={`tag tag-${entry.type}`}>{TYPE_LABELS[entry.type]}</span>
-                      <span className={styles.entryDate}>{format(new Date(entry.created_at), 'd MMM yyyy')}</span>
-                    </div>
-                    <p className={styles.entryPreview}>{getPreview(entry)}</p>
-                    <button className={styles.deleteBtn} onClick={(e) => handleDelete(entry.id, e)} title="Delete entry">✕</button>
-                  </div>
-                ))}
-              </div>
+              <GroupedEntries
+                entries={filtered}
+                onNavigate={(id) => navigate(`/entry/${id}`)}
+                onDelete={handleDelete}
+                typeLabels={TYPE_LABELS}
+                getPreview={getPreview}
+              />
             )}
           </section>
         </div>

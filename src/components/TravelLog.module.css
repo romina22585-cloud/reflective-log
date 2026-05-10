@@ -452,3 +452,33 @@
   font-style: italic;
   padding: 2rem 0;
 }
+
+/* Trip type toggle */
+.tripTypeToggle {
+  display: flex;
+  background: var(--parchment-dark);
+  border: 1px solid var(--parchment-deeper);
+  border-radius: 2rem;
+  padding: 3px;
+  gap: 3px;
+}
+
+.tripTypeBtn {
+  flex: 1;
+  padding: 0.4rem 0.75rem;
+  border: none;
+  border-radius: 2rem;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  cursor: pointer;
+  background: transparent;
+  transition: all 150ms ease;
+}
+
+.tripTypeBtnActive {
+  background: white;
+  color: var(--ink);
+  font-weight: 500;
+  box-shadow: 0 1px 4px rgba(26,18,8,0.1);
+}

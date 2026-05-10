@@ -151,7 +151,7 @@ export function useHabits() {
   const todayCompletedCount = habits.filter(h => isCompletedToday(h.id)).length
 
   return {
-    habits, logs, loading, today,
+    habits, logs, loading, today, refetchLogs: fetchLogs,
     toggleHabitOnDate, addHabit, deleteHabit, resetToDefaults,
     isCompletedToday, isCompletedOnDate, getStreak, getWeeklyScores,
     todayCompletedCount, totalHabits: habits.length

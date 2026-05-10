@@ -23,9 +23,14 @@ export function useTravel() {
     setLoading(false)
   }
 
-  const startTrip = async (destination: string, country: string, startDate: string) => {
+  const startTrip = async (destination: string, country: string, startDate: string, endDate?: string) => {
+    const isPast = !!endDate
     const { data, error } = await supabase.from('trips').insert([{
-      destination, country, start_date: startDate, is_active: true, user_id: user!.id
+      destination, country,
+      start_date: startDate,
+      end_date: endDate ?? null,
+      is_active: !isPast,
+      user_id: user!.id
     }]).select().single()
     if (!error && data) setTrips(prev => [data, ...prev])
     return { data, error: error?.message ?? null }

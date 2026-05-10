@@ -17,18 +17,21 @@ const GROUP_CONFIG = {
   weekly1: { title: 'Aim for at least once a week', color: 'var(--rust)' },
 }
 
-const DAY_OPTIONS = [
-  { label: 'Today', date: format(new Date(), 'yyyy-MM-dd'), offset: 0 },
-  { label: 'Yesterday', date: format(subDays(new Date(), 1), 'yyyy-MM-dd'), offset: 1 },
-  { label: format(subDays(new Date(), 2), 'EEE d MMM'), date: format(subDays(new Date(), 2), 'yyyy-MM-dd'), offset: 2 },
-  { label: format(subDays(new Date(), 3), 'EEE d MMM'), date: format(subDays(new Date(), 3), 'yyyy-MM-dd'), offset: 3 },
-]
+function getDayOptions() {
+  const now = new Date()
+  return [
+    { label: 'Today', date: format(now, 'yyyy-MM-dd') },
+    { label: 'Yesterday', date: format(subDays(now, 1), 'yyyy-MM-dd') },
+    { label: format(subDays(now, 2), 'EEE d MMM'), date: format(subDays(now, 2), 'yyyy-MM-dd') },
+    { label: format(subDays(now, 3), 'EEE d MMM'), date: format(subDays(now, 3), 'yyyy-MM-dd') },
+  ]
+}
 
 export default function HabitsTracker() {
   const {
     habits, logs, loading,
     toggleHabitOnDate, addHabit, deleteHabit, resetToDefaults,
-    isCompletedOnDate, getStreak, getWeeklyScores,
+    isCompletedOnDate, getStreak, getWeeklyScores, refetchLogs,
     todayCompletedCount, totalHabits
   } = useHabits()
 
@@ -38,6 +41,7 @@ export default function HabitsTracker() {
   const [confirmReset, setConfirmReset] = useState(false)
   const [view, setView] = useState<View>('today')
   const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null)
+  const DAY_OPTIONS = getDayOptions()
   const [selectedDate, setSelectedDate] = useState(DAY_OPTIONS[0].date)
 
   const handleAdd = async () => {
@@ -128,7 +132,7 @@ export default function HabitsTracker() {
                   key={opt.date}
                   type="button"
                   className={`${styles.dayBtn} ${selectedDate === opt.date ? styles.dayBtnActive : ''}`}
-                  onClick={() => setSelectedDate(opt.date)}
+                  onClick={async () => { await refetchLogs(); setSelectedDate(opt.date) }}
                 >
                   {opt.label}
                 </button>

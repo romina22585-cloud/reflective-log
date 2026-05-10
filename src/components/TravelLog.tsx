@@ -31,9 +31,9 @@ export default function TravelLog() {
       )}
       {view === 'newTrip' && (
         <NewTripForm
-          onSave={async (dest, country, date) => {
+          onSave={async (dest, country, date, endDate) => {
             setSaving(true)
-            await startTrip(dest, country, date)
+            await startTrip(dest, country, date, endDate)
             setSaving(false)
             setView('home')
           }}
@@ -165,14 +165,27 @@ function HomeView({ activeTrip, trips, entriesForTrip, onNewTrip, onDailyEntry, 
 }
 
 // ── NEW TRIP FORM ─────────────────────────────────────────────
-function NewTripForm({ onSave, onCancel, saving }: { onSave: (d: string, c: string, date: string) => void; onCancel: () => void; saving: boolean }) {
+function NewTripForm({ onSave, onCancel, saving }: { onSave: (d: string, c: string, startDate: string, endDate?: string) => void; onCancel: () => void; saving: boolean }) {
   const [destination, setDestination] = useState('')
   const [country, setCountry] = useState('')
   const [startDate, setStartDate] = useState(format(new Date(), 'yyyy-MM-dd'))
+  const [endDate, setEndDate] = useState(format(new Date(), 'yyyy-MM-dd'))
+  const [isPast, setIsPast] = useState(false)
 
   return (
     <div className={styles.form}>
-      <h2 className={styles.formTitle}>Start a new trip</h2>
+      <h2 className={styles.formTitle}>{isPast ? 'Log a past trip' : 'Start a new trip'}</h2>
+
+      {/* Toggle */}
+      <div className={styles.tripTypeToggle}>
+        <button type="button" className={`${styles.tripTypeBtn} ${!isPast ? styles.tripTypeBtnActive : ''}`} onClick={() => setIsPast(false)}>
+          Current trip
+        </button>
+        <button type="button" className={`${styles.tripTypeBtn} ${isPast ? styles.tripTypeBtnActive : ''}`} onClick={() => setIsPast(true)}>
+          Past trip
+        </button>
+      </div>
+
       <div className="field">
         <label>Destination / City</label>
         <input type="text" value={destination} onChange={e => setDestination(e.target.value)} placeholder="e.g. Tokyo" autoFocus />
@@ -185,10 +198,16 @@ function NewTripForm({ onSave, onCancel, saving }: { onSave: (d: string, c: stri
         <label>Start date</label>
         <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
       </div>
+      {isPast && (
+        <div className="field">
+          <label>End date</label>
+          <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} min={startDate} />
+        </div>
+      )}
       <div className={styles.formActions}>
         <button className="btn btn-secondary" onClick={onCancel}>Cancel</button>
-        <button className="btn btn-primary" onClick={() => onSave(destination, country, startDate)} disabled={!destination.trim() || saving}>
-          {saving ? 'Starting…' : 'Start trip ✈'}
+        <button className="btn btn-primary" onClick={() => onSave(destination, country, startDate, isPast ? endDate : undefined)} disabled={!destination.trim() || saving}>
+          {saving ? 'Saving…' : isPast ? 'Save past trip' : 'Start trip ✈'}
         </button>
       </div>
     </div>

@@ -441,3 +441,67 @@
 .tabChooser {
   grid-template-columns: 1fr 1fr 1fr !important;
 }
+
+/* Grouped entries by month */
+.monthGroup {
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--parchment-deeper);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: white;
+}
+
+.monthHeader {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--parchment);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 150ms ease;
+  gap: 0.5rem;
+}
+
+.monthHeader:hover {
+  background: var(--parchment-dark);
+}
+
+.monthLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.03em;
+  flex: 1;
+}
+
+.monthMeta {
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  letter-spacing: 0.04em;
+}
+
+.monthChevron {
+  font-size: 0.55rem;
+  color: var(--ink-muted);
+  flex-shrink: 0;
+}
+
+.monthEntries {
+  display: flex;
+  flex-direction: column;
+  animation: fadeUp 0.2s ease forwards;
+}
+
+.monthEntries .entryRow {
+  border-radius: 0;
+  border: none;
+  border-top: 1px solid var(--parchment);
+  box-shadow: none;
+}
+
+.monthEntries .entryRow:hover {
+  background: var(--parchment);
+  transform: none;
+}

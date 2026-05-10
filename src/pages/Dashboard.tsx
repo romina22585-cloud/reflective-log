@@ -7,6 +7,7 @@ import HabitsTracker from '../components/HabitsTracker'
 import { useProfile } from '../hooks/useProfile'
 import MultiEntryInsights from '../components/MultiEntryInsights'
 import TravelLog from '../components/TravelLog'
+import ClaudeInsights from '../components/ClaudeInsights'
 import styles from './Dashboard.module.css'
 
 const TYPE_LABELS = { daily: 'Evening Check-in', freewrite: 'Free Write', weekly: 'Weekly Reflection', morning: 'Morning Check-in' }
@@ -201,6 +202,10 @@ export default function Dashboard() {
 
           <section className={styles.section}>
             <MultiEntryInsights entries={entries} />
+          </section>
+
+          <section className={styles.section}>
+            <ClaudeInsights />
           </section>
 
           <section className={styles.section}>

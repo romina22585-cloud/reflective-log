@@ -180,8 +180,6 @@ export default function Dashboard() {
         </div>
       )}
 
-    </div>
-
       {/* ── TRAVEL PANEL ── */}
       {tab === 'travel' && (
         <div className={`${styles.tabPanel} ${styles.tabPanelTravel}`} key="travel">

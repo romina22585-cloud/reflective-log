@@ -142,19 +142,6 @@ export default function MultiEntryInsights({ entries }: Props) {
 
   return (
     <div className={styles.wrapper}>
-      {multiReflections.length > 0 && (
-        <div className={styles.savedList}>
-          <p className={styles.savedListTitle}>◈ Saved insights</p>
-          {multiReflections.map(r => (
-            <div key={r.id} className={styles.savedItem}>
-              <p className={styles.savedDate}>{format(new Date(r.created_at), 'd MMM yyyy · h:mm a')}</p>
-              <p className={styles.savedText}>{r.content}</p>
-              <button className={styles.deleteBtn} onClick={() => deleteReflection(r.id)}>Delete</button>
-            </div>
-          ))}
-        </div>
-      )}
-
       {!dismissed && (
         <>
           {!shown ? (

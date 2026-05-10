@@ -95,18 +95,6 @@ export default function AIReflection({ entry }: Props) {
 
   return (
     <div>
-      {reflections.length > 0 && (
-        <div className={styles.savedList}>
-          <p className={styles.savedListTitle}>✦ Saved reflections</p>
-          {reflections.map(r => (
-            <div key={r.id} className={styles.savedItem}>
-              <p className={styles.savedDate}>{format(new Date(r.created_at), 'd MMM yyyy · h:mm a')}</p>
-              <p className={styles.savedText}>{r.content}</p>
-              <button className={styles.deleteReflection} onClick={() => deleteReflection(r.id)}>Delete</button>
-            </div>
-          ))}
-        </div>
-      )}
       {!shown ? (
         <button className={styles.trigger} onClick={askClaude}>
           <span className={styles.triggerIcon}>✦</span>

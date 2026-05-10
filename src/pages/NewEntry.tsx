@@ -4,28 +4,12 @@ import { useEntries } from '../hooks/useEntries'
 import { EntryType, DailyContent, FreewriteContent, WeeklyContent, MorningContent, Article } from '../types'
 import styles from './NewEntry.module.css'
 
-const EVENING_STEPS = [
-  { key: 'energy', label: 'Energy level', prompt: 'How is your energy right now at the end of the day?' },
-  { key: 'highlight', label: 'Highlight of today', prompt: 'What was the most meaningful moment or achievement today — however small?' },
-  { key: 'challenge', label: 'Challenge faced', prompt: 'What was difficult or draining today? What made it hard?' },
-  { key: 'decision', label: 'A decision I made', prompt: 'Describe a decision you made today. What drove it? Would you decide the same again?' },
-  { key: 'emotion', label: 'Emotional check-in', prompt: 'How are you feeling right now? What is underneath that feeling?' },
-  { key: 'tomorrow', label: 'One intention for tomorrow', prompt: 'What is one thing you want to carry into tomorrow — an action, attitude, or reminder?' },
-]
-
 const WEEKLY_FIELDS = [
   { key: 'wins', label: 'Wins this week', prompt: 'What went well? What are you proud of, professionally or personally?' },
   { key: 'patterns', label: 'Patterns I noticed', prompt: 'Any recurring themes — in your behaviour, reactions, or situations? What are they telling you?' },
   { key: 'difficult', label: 'What was difficult', prompt: 'What challenged you most this week? What did it reveal about you?' },
   { key: 'learned', label: 'What I learned', prompt: 'What is one insight or lesson from this week you want to carry forward?' },
   { key: 'nextWeek', label: 'Intention for next week', prompt: 'What do you want to do differently or focus on next week?' },
-]
-
-const MORNING_STEPS = [
-  { key: 'energy', label: 'Energy level', prompt: 'How is your energy right now, honestly?' },
-  { key: 'gratitude', label: 'Gratitude', prompt: 'What is one thing — small or large — you feel genuinely grateful for today?' },
-  { key: 'intention', label: 'Intention for today', prompt: 'What is the one thing that, if you achieved it today, would make the day feel worthwhile?' },
-  { key: 'lookingForward', label: "Something I'm looking forward to", prompt: 'What is something — however small — that you are looking forward to today?' },
 ]
 
 function EnergyPicker({ value, onChange }: { value: number; onChange: (n: number) => void }) {
@@ -41,25 +25,35 @@ function EnergyPicker({ value, onChange }: { value: number; onChange: (n: number
   )
 }
 
+// ── MORNING FORM ──────────────────────────────────────────────
 function MorningForm({ onSave }: { onSave: (content: MorningContent) => void }) {
   const [step, setStep] = useState(0)
   const [energy, setEnergy] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>({})
-  const current = MORNING_STEPS[step]
-  const isLast = step === MORNING_STEPS.length - 1
 
-  const currentValue = current.key === 'energy' ? energy : (answers[current.key] || '')
-  const isValid = current.key === 'energy' ? energy > 0 : String(currentValue).trim().length > 0
+  const STEPS = [
+    { key: 'energy', label: 'Energy level', prompt: 'How is your energy right now, honestly?', optional: false },
+    { key: 'gratitude', label: 'Gratitude', prompt: 'What is one thing — small or large — you feel genuinely grateful for today?', optional: false },
+    { key: 'intention', label: 'Intention for today', prompt: 'What is the one thing that, if you achieved it today, would make the day feel worthwhile?', optional: false },
+    { key: 'lookingForward', label: "Something I'm looking forward to", prompt: 'What is something — however small — that you are looking forward to today?', optional: true },
+  ]
+
+  const current = STEPS[step]
+  const isLast = step === STEPS.length - 1
+  const isValid = current.key === 'energy' ? energy > 0 : String(answers[current.key] || '').trim().length > 0
 
   const handleNext = () => {
-    if (!isValid) return
+    if (!isValid && !current.optional) return
     if (isLast) {
-      onSave({
-        energy,
-        gratitude: answers.gratitude || '',
-        intention: answers.intention || '',
-        lookingForward: answers.lookingForward || '',
-      })
+      onSave({ energy, gratitude: answers.gratitude || '', intention: answers.intention || '', lookingForward: answers.lookingForward || '' })
+    } else {
+      setStep(s => s + 1)
+    }
+  }
+
+  const handleSkip = () => {
+    if (isLast) {
+      onSave({ energy, gratitude: answers.gratitude || '', intention: answers.intention || '', lookingForward: '' })
     } else {
       setStep(s => s + 1)
     }
@@ -68,31 +62,29 @@ function MorningForm({ onSave }: { onSave: (content: MorningContent) => void }) 
   return (
     <div className={styles.form}>
       <div className={styles.progress}>
-        {MORNING_STEPS.map((_, i) => (
-          <div key={i} className={`${styles.progressDot} ${i <= step ? styles.progressDotActive : ''}`} />
-        ))}
+        {STEPS.map((_, i) => <div key={i} className={`${styles.progressDot} ${i <= step ? styles.progressDotActive : ''}`} />)}
       </div>
       <div className={styles.stepContent} key={step}>
-        <p className={styles.stepLabel}>{step + 1} of {MORNING_STEPS.length}</p>
+        <div className={styles.stepLabelRow}>
+          <p className={styles.stepLabel}>{step + 1} of {STEPS.length}</p>
+          {current.optional && <span className={styles.optionalBadge}>Optional</span>}
+        </div>
         <h2 className={styles.stepQuestion}>{current.label}</h2>
         <p className={styles.stepPrompt}>{current.prompt}</p>
         {current.key === 'energy' ? (
           <EnergyPicker value={energy} onChange={setEnergy} />
         ) : (
           <div className="field">
-            <textarea
-              autoFocus
-              placeholder="Write freely…"
-              value={answers[current.key] || ''}
-              onChange={e => setAnswers(a => ({ ...a, [current.key]: e.target.value }))}
-              rows={4}
-            />
+            <textarea autoFocus placeholder="Write freely…" value={answers[current.key] || ''} onChange={e => setAnswers(a => ({ ...a, [current.key]: e.target.value }))} rows={4} />
           </div>
         )}
       </div>
       <div className={styles.formActions}>
         {step > 0 && <button type="button" className="btn btn-secondary" onClick={() => setStep(s => s - 1)}>← Back</button>}
-        <button type="button" className="btn btn-primary" onClick={handleNext} disabled={!isValid}>
+        {current.optional && (
+          <button type="button" className="btn btn-secondary" onClick={handleSkip}>Skip</button>
+        )}
+        <button type="button" className="btn btn-primary" onClick={handleNext} disabled={!isValid && !current.optional}>
           {isLast ? 'Save entry' : 'Next →'}
         </button>
       </div>
@@ -100,24 +92,47 @@ function MorningForm({ onSave }: { onSave: (content: MorningContent) => void }) 
   )
 }
 
+// ── EVENING FORM ──────────────────────────────────────────────
+// Steps: 1) Energy, 2) Day rating + 3 questions, 3) Emotional check-in, 4) Intention
 function EveningForm({ onSave }: { onSave: (content: DailyContent) => void }) {
   const [step, setStep] = useState(0)
   const [energy, setEnergy] = useState(0)
-  const [answers, setAnswers] = useState<Record<string, string>>({})
-  const current = EVENING_STEPS[step]
-  const isLast = step === EVENING_STEPS.length - 1
-  const isValid = current.key === 'energy' ? energy > 0 : !!(answers[current.key]?.trim())
+  const [dayRating, setDayRating] = useState(0)
+  const [whatWasGood, setWhatWasGood] = useState('')
+  const [whatWasNotGood, setWhatWasNotGood] = useState('')
+  const [dodifferently, setDodifferently] = useState('')
+  const [emotion, setEmotion] = useState('')
+  const [tomorrow, setTomorrow] = useState('')
+
+  const STEPS = [
+    { key: 'energy', label: 'Energy level', prompt: 'How is your energy right now at the end of the day?' },
+    { key: 'dayReview', label: 'How was your day?', prompt: 'Rate your day and reflect on it.' },
+    { key: 'emotion', label: 'Emotional check-in', prompt: 'How are you feeling right now? What is underneath that feeling?' },
+    { key: 'tomorrow', label: 'One intention for tomorrow', prompt: 'What is one thing you want to carry into tomorrow — an action, attitude, or reminder?' },
+  ]
+
+  const current = STEPS[step]
+  const isLast = step === STEPS.length - 1
+
+  const isValid = () => {
+    if (current.key === 'energy') return energy > 0
+    if (current.key === 'dayReview') return dayRating > 0
+    if (current.key === 'emotion') return emotion.trim().length > 0
+    if (current.key === 'tomorrow') return tomorrow.trim().length > 0
+    return false
+  }
 
   const handleNext = () => {
-    if (!isValid) return
+    if (!isValid()) return
     if (isLast) {
       onSave({
         energy: energy as unknown as string,
-        highlight: answers.highlight || '',
-        challenge: answers.challenge || '',
-        decision: answers.decision || '',
-        emotion: answers.emotion || '',
-        tomorrow: answers.tomorrow || '',
+        dayRating: dayRating as unknown as string,
+        whatWasGood,
+        whatWasNotGood,
+        dodifferently,
+        emotion,
+        tomorrow,
       } as unknown as DailyContent)
     } else {
       setStep(s => s + 1)
@@ -127,25 +142,50 @@ function EveningForm({ onSave }: { onSave: (content: DailyContent) => void }) {
   return (
     <div className={styles.form}>
       <div className={styles.progress}>
-        {EVENING_STEPS.map((_, i) => (
-          <div key={i} className={`${styles.progressDot} ${i <= step ? styles.progressDotActive : ''}`} />
-        ))}
+        {STEPS.map((_, i) => <div key={i} className={`${styles.progressDot} ${i <= step ? styles.progressDotActive : ''}`} />)}
       </div>
       <div className={styles.stepContent} key={step}>
-        <p className={styles.stepLabel}>{step + 1} of {EVENING_STEPS.length}</p>
+        <p className={styles.stepLabel}>{step + 1} of {STEPS.length}</p>
         <h2 className={styles.stepQuestion}>{current.label}</h2>
         <p className={styles.stepPrompt}>{current.prompt}</p>
-        {current.key === 'energy' ? (
-          <EnergyPicker value={energy} onChange={setEnergy} />
-        ) : (
+
+        {current.key === 'energy' && <EnergyPicker value={energy} onChange={setEnergy} />}
+
+        {current.key === 'dayReview' && (
+          <div className={styles.dayReview}>
+            <EnergyPicker value={dayRating} onChange={setDayRating} />
+            <div className={styles.dayReviewQuestions}>
+              <div className="field">
+                <label>What was good?</label>
+                <textarea placeholder="Write freely…" value={whatWasGood} onChange={e => setWhatWasGood(e.target.value)} rows={2} />
+              </div>
+              <div className="field">
+                <label>What was not so good?</label>
+                <textarea placeholder="Write freely…" value={whatWasNotGood} onChange={e => setWhatWasNotGood(e.target.value)} rows={2} />
+              </div>
+              <div className="field">
+                <label>What would you do differently?</label>
+                <textarea placeholder="Write freely…" value={dodifferently} onChange={e => setDodifferently(e.target.value)} rows={2} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {current.key === 'emotion' && (
           <div className="field">
-            <textarea autoFocus placeholder="Write freely…" value={answers[current.key] || ''} onChange={e => setAnswers(a => ({ ...a, [current.key]: e.target.value }))} rows={5} />
+            <textarea autoFocus placeholder="Write freely…" value={emotion} onChange={e => setEmotion(e.target.value)} rows={5} />
+          </div>
+        )}
+
+        {current.key === 'tomorrow' && (
+          <div className="field">
+            <textarea autoFocus placeholder="Write freely…" value={tomorrow} onChange={e => setTomorrow(e.target.value)} rows={5} />
           </div>
         )}
       </div>
       <div className={styles.formActions}>
         {step > 0 && <button type="button" className="btn btn-secondary" onClick={() => setStep(s => s - 1)}>← Back</button>}
-        <button type="button" className="btn btn-primary" onClick={handleNext} disabled={!isValid}>
+        <button type="button" className="btn btn-primary" onClick={handleNext} disabled={!isValid()}>
           {isLast ? 'Save entry' : 'Next →'}
         </button>
       </div>
@@ -153,6 +193,7 @@ function EveningForm({ onSave }: { onSave: (content: DailyContent) => void }) {
   )
 }
 
+// ── FREEWRITE FORM ─────────────────────────────────────────────
 function ArticlePinner({ articles, onAdd, onRemove }: { articles: Article[]; onAdd: (a: Article) => void; onRemove: (url: string) => void }) {
   const [url, setUrl] = useState('')
   const [fetching, setFetching] = useState(false)
@@ -170,7 +211,7 @@ function ArticlePinner({ articles, onAdd, onRemove }: { articles: Article[]; onA
       onAdd({ url: url.trim(), title, addedAt: new Date().toISOString() })
       setUrl('')
     } catch {
-      setError('Saved with URL only — could not fetch title.')
+      setError('Saved with URL only.')
       onAdd({ url: url.trim(), title: url.trim(), addedAt: new Date().toISOString() })
       setUrl('')
     }
@@ -202,7 +243,6 @@ function ArticlePinner({ articles, onAdd, onRemove }: { articles: Article[]; onA
 function FreewriteForm({ onSave }: { onSave: (content: FreewriteContent) => void }) {
   const [text, setText] = useState('')
   const [articles, setArticles] = useState<Article[]>([])
-
   return (
     <div className={styles.form}>
       <div className={styles.stepContent}>
@@ -221,11 +261,11 @@ function FreewriteForm({ onSave }: { onSave: (content: FreewriteContent) => void
   )
 }
 
+// ── WEEKLY FORM ────────────────────────────────────────────────
 function WeeklyForm({ onSave }: { onSave: (content: WeeklyContent) => void }) {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [rating, setRating] = useState(0)
   const allFilled = WEEKLY_FIELDS.every(f => answers[f.key]?.trim()) && rating > 0
-
   return (
     <div className={styles.form}>
       <div className={styles.stepContent}>
@@ -254,6 +294,7 @@ function WeeklyForm({ onSave }: { onSave: (content: WeeklyContent) => void }) {
   )
 }
 
+// ── MAIN ───────────────────────────────────────────────────────
 export default function NewEntry() {
   const { type } = useParams<{ type: string }>()
   const navigate = useNavigate()
@@ -264,16 +305,11 @@ export default function NewEntry() {
   const entryType = (type as EntryType) || 'daily'
 
   const handleSave = async (content: DailyContent | FreewriteContent | WeeklyContent | MorningContent) => {
-    setSaving(true)
-    setSaveError('')
+    setSaving(true); setSaveError('')
     const { error } = await createEntry(entryType, content)
     setSaving(false)
-    if (!error) {
-      setSaved(true)
-      setTimeout(() => navigate('/'), 1200)
-    } else {
-      setSaveError('Could not save. Please try again.')
-    }
+    if (!error) { setSaved(true); setTimeout(() => navigate('/'), 1200) }
+    else setSaveError('Could not save. Please try again.')
   }
 
   if (saved) {

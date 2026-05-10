@@ -6,6 +6,7 @@ import StreakMilestone from './StreakMilestone'
 import WeeklyTrafficLight from './WeeklyTrafficLight'
 import { HABIT_GROUPS } from '../lib/habitBenefits'
 import { Habit } from '../types'
+import { format, subDays } from 'date-fns'
 import styles from './HabitsTracker.module.css'
 
 type View = 'today' | 'history'
@@ -16,11 +17,18 @@ const GROUP_CONFIG = {
   weekly1: { title: 'Aim for at least once a week', color: 'var(--rust)' },
 }
 
+const DAY_OPTIONS = [
+  { label: 'Today', date: format(new Date(), 'yyyy-MM-dd'), offset: 0 },
+  { label: 'Yesterday', date: format(subDays(new Date(), 1), 'yyyy-MM-dd'), offset: 1 },
+  { label: format(subDays(new Date(), 2), 'EEE d MMM'), date: format(subDays(new Date(), 2), 'yyyy-MM-dd'), offset: 2 },
+  { label: format(subDays(new Date(), 3), 'EEE d MMM'), date: format(subDays(new Date(), 3), 'yyyy-MM-dd'), offset: 3 },
+]
+
 export default function HabitsTracker() {
   const {
     habits, logs, loading,
-    toggleHabit, addHabit, deleteHabit, resetToDefaults,
-    isCompletedToday, getStreak, getWeeklyScores,
+    toggleHabitOnDate, addHabit, deleteHabit, resetToDefaults,
+    isCompletedOnDate, getStreak, getWeeklyScores,
     todayCompletedCount, totalHabits
   } = useHabits()
 
@@ -30,6 +38,7 @@ export default function HabitsTracker() {
   const [confirmReset, setConfirmReset] = useState(false)
   const [view, setView] = useState<View>('today')
   const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null)
+  const [selectedDate, setSelectedDate] = useState(DAY_OPTIONS[0].date)
 
   const handleAdd = async () => {
     if (!newName.trim()) return
@@ -44,7 +53,6 @@ export default function HabitsTracker() {
 
   if (loading) return null
 
-  // Group habits
   const grouped = {
     daily: habits.filter(h => (HABIT_GROUPS[h.name]?.group || 'daily') === 'daily'),
     weekly4: habits.filter(h => HABIT_GROUPS[h.name]?.group === 'weekly4'),
@@ -53,12 +61,14 @@ export default function HabitsTracker() {
   }
 
   const weeklyScores = getWeeklyScores()
+  const completedForDate = habits.filter(h => isCompletedOnDate(h.id, selectedDate)).length
 
   const renderHabitRow = (habit: Habit) => {
-    const done = isCompletedToday(habit.id)
+    const done = isCompletedOnDate(habit.id, selectedDate)
     const streak = getStreak(habit.id)
     return (
-      <div key={habit.id} className={`${styles.habitRow} ${done ? styles.habitDone : ''}`} onClick={() => toggleHabit(habit.id)}>
+      <div key={habit.id} className={`${styles.habitRow} ${done ? styles.habitDone : ''}`}
+        onClick={() => toggleHabitOnDate(habit.id, selectedDate)}>
         <div className={`${styles.checkbox} ${done ? styles.checkboxChecked : ''}`}>
           {done && <span className={styles.checkmark}>✓</span>}
         </div>
@@ -78,7 +88,6 @@ export default function HabitsTracker() {
     <div className={styles.wrapper}>
       <StreakMilestone habits={habits} getStreak={getStreak} />
 
-      {/* Traffic light — top */}
       {view === 'today' && (
         <WeeklyTrafficLight
           group1Score={weeklyScores.group1Score}
@@ -90,59 +99,60 @@ export default function HabitsTracker() {
       <div className={styles.tracker}>
         <div className={styles.trackerHeader}>
           <div>
-            <p className={styles.trackerTitle}>Today's habits</p>
-            <p className={styles.trackerScore}>{todayCompletedCount} of {totalHabits} completed</p>
+            <p className={styles.trackerTitle}>Habits</p>
+            <p className={styles.trackerScore}>{completedForDate} of {totalHabits} completed</p>
           </div>
           <div className={styles.headerRight}>
             <div className={styles.viewToggle}>
-              <button type="button" className={`${styles.viewBtn} ${view === 'today' ? styles.viewBtnActive : ''}`} onClick={() => setView('today')}>Today</button>
+              <button type="button" className={`${styles.viewBtn} ${view === 'today' ? styles.viewBtnActive : ''}`} onClick={() => setView('today')}>Log</button>
               <button type="button" className={`${styles.viewBtn} ${view === 'history' ? styles.viewBtnActive : ''}`} onClick={() => setView('history')}>History</button>
             </div>
             <div className={styles.progressRing}>
               <svg viewBox="0 0 36 36">
                 <circle cx="18" cy="18" r="15" fill="none" stroke="var(--parchment-deeper)" strokeWidth="3" />
                 <circle cx="18" cy="18" r="15" fill="none" stroke="var(--gold)" strokeWidth="3"
-                  strokeDasharray={`${totalHabits > 0 ? (todayCompletedCount / totalHabits) * 94 : 0} 94`}
+                  strokeDasharray={`${totalHabits > 0 ? (completedForDate / totalHabits) * 94 : 0} 94`}
                   strokeLinecap="round" transform="rotate(-90 18 18)" />
               </svg>
-              <span>{totalHabits > 0 ? Math.round((todayCompletedCount / totalHabits) * 100) : 0}%</span>
+              <span>{totalHabits > 0 ? Math.round((completedForDate / totalHabits) * 100) : 0}%</span>
             </div>
           </div>
         </div>
 
         {view === 'today' && (
           <>
-            {/* Group 1 */}
+            {/* Day selector */}
+            <div className={styles.daySelector}>
+              {DAY_OPTIONS.map(opt => (
+                <button
+                  key={opt.date}
+                  type="button"
+                  className={`${styles.dayBtn} ${selectedDate === opt.date ? styles.dayBtnActive : ''}`}
+                  onClick={() => setSelectedDate(opt.date)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
             {grouped.daily.length > 0 && (
               <div className={styles.group}>
-                <p className={styles.groupLabel} style={{ color: GROUP_CONFIG.daily.color }}>
-                  {GROUP_CONFIG.daily.title}
-                </p>
+                <p className={styles.groupLabel} style={{ color: GROUP_CONFIG.daily.color }}>{GROUP_CONFIG.daily.title}</p>
                 <div className={styles.habitList}>{grouped.daily.map(renderHabitRow)}</div>
               </div>
             )}
-
-            {/* Group 2 */}
             {grouped.weekly4.length > 0 && (
               <div className={styles.group}>
-                <p className={styles.groupLabel} style={{ color: GROUP_CONFIG.weekly4.color }}>
-                  {GROUP_CONFIG.weekly4.title}
-                </p>
+                <p className={styles.groupLabel} style={{ color: GROUP_CONFIG.weekly4.color }}>{GROUP_CONFIG.weekly4.title}</p>
                 <div className={styles.habitList}>{grouped.weekly4.map(renderHabitRow)}</div>
               </div>
             )}
-
-            {/* Group 3 */}
             {grouped.weekly1.length > 0 && (
               <div className={styles.group}>
-                <p className={styles.groupLabel} style={{ color: GROUP_CONFIG.weekly1.color }}>
-                  {GROUP_CONFIG.weekly1.title}
-                </p>
+                <p className={styles.groupLabel} style={{ color: GROUP_CONFIG.weekly1.color }}>{GROUP_CONFIG.weekly1.title}</p>
                 <div className={styles.habitList}>{grouped.weekly1.map(renderHabitRow)}</div>
               </div>
             )}
-
-            {/* Custom habits */}
             {grouped.custom.length > 0 && (
               <div className={styles.group}>
                 <p className={styles.groupLabel}>Custom habits</p>

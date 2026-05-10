@@ -82,15 +82,14 @@ export function useHabits() {
     setLoading(false)
   }
 
-  const toggleHabit = async (habitId: string) => {
-    const currentToday = getTodayStr()
-    const existing = logs.find(l => l.habit_id === habitId && l.logged_date === currentToday)
+  const toggleHabitOnDate = async (habitId: string, dateStr: string) => {
+    const existing = logs.find(l => l.habit_id === habitId && l.logged_date === dateStr)
     if (existing) {
       await supabase.from('habit_logs').delete().eq('id', existing.id)
       setLogs(prev => prev.filter(l => l.id !== existing.id))
     } else {
       const { data } = await supabase.from('habit_logs').insert([{
-        habit_id: habitId, user_id: user!.id, logged_date: currentToday,
+        habit_id: habitId, user_id: user!.id, logged_date: dateStr,
       }]).select().single()
       if (data) setLogs(prev => [...prev, data])
     }
@@ -134,24 +133,18 @@ export function useHabits() {
     const weekEnd = endOfWeek(new Date(), { weekStartsOn: 1 })
     const weekDays: string[] = []
     const d = new Date(weekStart)
-    while (d <= weekEnd) {
-      weekDays.push(format(d, 'yyyy-MM-dd'))
-      d.setDate(d.getDate() + 1)
-    }
+    while (d <= weekEnd) { weekDays.push(format(d, 'yyyy-MM-dd')); d.setDate(d.getDate() + 1) }
 
     let group1Score = 0, group2Score = 0, group3Score = 0
-
     for (const habit of habits) {
       const group = HABIT_GROUPS[habit.name]?.group || 'daily'
       const completedDays = weekDays.filter(day =>
         logs.some(l => l.habit_id === habit.id && l.logged_date === day)
       ).length
-
       if (group === 'daily') group1Score += completedDays
       else if (group === 'weekly4') group2Score += completedDays
       else if (group === 'weekly1') group3Score += completedDays > 0 ? 1 : 0
     }
-
     return { group1Score, group2Score, group3Score }
   }
 
@@ -159,7 +152,7 @@ export function useHabits() {
 
   return {
     habits, logs, loading, today,
-    toggleHabit, addHabit, deleteHabit, resetToDefaults,
+    toggleHabitOnDate, addHabit, deleteHabit, resetToDefaults,
     isCompletedToday, isCompletedOnDate, getStreak, getWeeklyScores,
     todayCompletedCount, totalHabits: habits.length
   }

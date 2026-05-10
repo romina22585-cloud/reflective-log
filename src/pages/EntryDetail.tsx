@@ -7,11 +7,16 @@ import styles from './EntryDetail.module.css'
 
 const DAILY_LABELS: Record<string, string> = {
   energy: 'Energy level',
+  dayRating: 'Day rating',
+  whatWasGood: 'What was good',
+  whatWasNotGood: 'What was not so good',
+  dodifferently: 'What would I do differently',
+  emotion: 'Emotional check-in',
+  tomorrow: 'Intention for tomorrow',
+  // legacy fields
   highlight: 'Highlight of the day',
   challenge: 'Challenge faced',
   decision: 'A decision I made',
-  emotion: 'Emotional check-in',
-  tomorrow: 'Intention for tomorrow',
 }
 
 const WEEKLY_LABELS: Record<string, string> = {
@@ -83,12 +88,26 @@ export default function EntryDetail() {
 
       {entry.type === 'daily' && (
         <div className={styles.sections}>
-          {Object.entries(entry.content as DailyContent).map(([key, value]) => (
-            <div key={key} className={styles.section}>
-              <p className={styles.sectionLabel}>{DAILY_LABELS[key] || key}</p>
-              <p className={styles.sectionText}>{String(value ?? "")}</p>
-            </div>
-          ))}
+          {Object.entries(entry.content as DailyContent).map(([key, value]) => {
+            if (!value && value !== 0) return null
+            if (key === 'energy' || key === 'dayRating') return (
+              <div key={key} className={styles.section}>
+                <p className={styles.sectionLabel}>{DAILY_LABELS[key] || key}</p>
+                <div className={styles.energyDisplay}>
+                  {[1,2,3,4,5].map(n => (
+                    <span key={n} className={`${styles.energyDot} ${n <= (value as number) ? styles.energyDotFilled : ''}`} />
+                  ))}
+                  <span className={styles.energyText}>{['','Low','Tired','Ok','Good','Great'][value as number]}</span>
+                </div>
+              </div>
+            )
+            return (
+              <div key={key} className={styles.section}>
+                <p className={styles.sectionLabel}>{DAILY_LABELS[key] || key}</p>
+                <p className={styles.sectionText}>{String(value ?? "")}</p>
+              </div>
+            )
+          })}
         </div>
       )}
 

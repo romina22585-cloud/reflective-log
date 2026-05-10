@@ -313,3 +313,35 @@
   border-bottom: 1px solid var(--parchment-deeper);
   margin-bottom: 0.2rem;
 }
+
+/* Day selector */
+.daySelector {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.dayBtn {
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--parchment-deeper);
+  border-radius: 2rem;
+  background: white;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: all 150ms ease;
+  letter-spacing: 0.02em;
+}
+
+.dayBtn:hover {
+  border-color: var(--gold-light);
+  color: var(--ink);
+}
+
+.dayBtnActive {
+  background: var(--ink) !important;
+  border-color: var(--ink) !important;
+  color: white !important;
+  font-weight: 500;
+}

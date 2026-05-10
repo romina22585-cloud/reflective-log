@@ -9,8 +9,8 @@ interface Props {
 type Status = 'green' | 'amber' | 'red'
 
 function getStatus(g1: number, g2: number, g3: number): Status {
-  if (g1 >= 40 && g2 >= 25 && g3 >= 1) return 'green'
-  if (g1 >= 25 && g2 >= 15 && g3 >= 1) return 'amber'
+  if (g1 >= 35 && g2 >= 25 && g3 >= 1) return 'green'
+  if (g1 >= 20 && g2 >= 15 && g3 >= 1) return 'amber'
   return 'red'
 }
 
@@ -45,24 +45,21 @@ export default function WeeklyTrafficLight({ group1Score, group2Score, group3Sco
   const status = getStatus(group1Score, group2Score, group3Score)
   const config = STATUS_CONFIG[status]
 
-  // Max possible scores
-  const g1Max = 70 // 10 habits × 7 days
-  const g2Max = 56 // 8 habits × 7 days
-  const g3Max = 4  // 4 habits
+  const g1Max = 70
+  const g2Max = 56
+  const g3Max = 4
 
   const g1Pct = Math.min((group1Score / g1Max) * 100, 100)
   const g2Pct = Math.min((group2Score / g2Max) * 100, 100)
   const g3Pct = Math.min((group3Score / g3Max) * 100, 100)
 
-  // Traffic light thresholds as percentages of max
-  const g1GreenPct = (40 / g1Max) * 100
-  const g1AmberPct = (25 / g1Max) * 100
+  const g1GreenPct = (35 / g1Max) * 100
+  const g1AmberPct = (20 / g1Max) * 100
   const g2GreenPct = (25 / g2Max) * 100
   const g2AmberPct = (15 / g2Max) * 100
 
   return (
     <div className={styles.wrapper} style={{ background: config.bg, borderColor: config.border }}>
-      {/* Status header */}
       <div className={styles.header}>
         <div className={styles.statusLeft}>
           <span className={styles.statusEmoji}>{config.emoji}</span>
@@ -79,7 +76,6 @@ export default function WeeklyTrafficLight({ group1Score, group2Score, group3Sco
         </div>
       </div>
 
-      {/* Progress bars */}
       <div className={styles.bars}>
         <div className={styles.barGroup}>
           <div className={styles.barLabel}>
@@ -88,8 +84,8 @@ export default function WeeklyTrafficLight({ group1Score, group2Score, group3Sco
           </div>
           <div className={styles.barTrack}>
             <div className={styles.barFill} style={{ width: `${g1Pct}%`, background: config.color }} />
-            <div className={styles.barMarker} style={{ left: `${g1GreenPct}%` }} title="Green threshold" />
-            <div className={styles.barMarker} style={{ left: `${g1AmberPct}%` }} title="Amber threshold" />
+            <div className={styles.barMarker} style={{ left: `${g1GreenPct}%` }} title="Green: 35" />
+            <div className={styles.barMarker} style={{ left: `${g1AmberPct}%` }} title="Amber: 20" />
           </div>
         </div>
 
@@ -100,8 +96,8 @@ export default function WeeklyTrafficLight({ group1Score, group2Score, group3Sco
           </div>
           <div className={styles.barTrack}>
             <div className={styles.barFill} style={{ width: `${g2Pct}%`, background: config.color }} />
-            <div className={styles.barMarker} style={{ left: `${g2GreenPct}%` }} title="Green threshold" />
-            <div className={styles.barMarker} style={{ left: `${g2AmberPct}%` }} title="Amber threshold" />
+            <div className={styles.barMarker} style={{ left: `${g2GreenPct}%` }} title="Green: 25" />
+            <div className={styles.barMarker} style={{ left: `${g2AmberPct}%` }} title="Amber: 15" />
           </div>
         </div>
 

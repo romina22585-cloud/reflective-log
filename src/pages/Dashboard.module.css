@@ -411,3 +411,33 @@
   background: rgba(107, 124, 92, 0.03);
   border: 1px solid rgba(107, 124, 92, 0.12);
 }
+
+/* Travel tab */
+.tabCardTravel {
+  background: rgba(70, 100, 140, 0.08);
+  border-color: rgba(70, 100, 140, 0.2);
+  color: #46648c;
+}
+
+.tabCardTravel:hover {
+  background: rgba(70, 100, 140, 0.13);
+  border-color: rgba(70, 100, 140, 0.4);
+  transform: translateY(-1px);
+}
+
+.tabCardTravel.tabCardActive {
+  background: #46648c;
+  border-color: #46648c;
+  color: white;
+  box-shadow: 0 4px 16px rgba(70, 100, 140, 0.3);
+}
+
+.tabPanelTravel {
+  background: rgba(70, 100, 140, 0.03);
+  border: 1px solid rgba(70, 100, 140, 0.12);
+}
+
+/* Fix tab grid for 3 columns */
+.tabChooser {
+  grid-template-columns: 1fr 1fr 1fr !important;
+}

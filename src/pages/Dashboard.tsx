@@ -6,6 +6,7 @@ import { Entry } from '../types'
 import HabitsTracker from '../components/HabitsTracker'
 import { useProfile } from '../hooks/useProfile'
 import MultiEntryInsights from '../components/MultiEntryInsights'
+import TravelLog from '../components/TravelLog'
 import styles from './Dashboard.module.css'
 
 const TYPE_LABELS = { daily: 'Evening Check-in', freewrite: 'Free Write', weekly: 'Weekly Reflection', morning: 'Morning Check-in' }
@@ -25,7 +26,7 @@ function getPreview(entry: Entry): string {
   return ''
 }
 
-type Tab = 'habits' | 'journal' | null
+type Tab = 'habits' | 'journal' | 'travel' | null
 
 export default function Dashboard() {
   const { displayName } = useProfile()
@@ -85,6 +86,15 @@ export default function Dashboard() {
           <span className={styles.tabCardIcon}>◈</span>
           <span className={styles.tabCardLabel}>Reflection Journal</span>
           <span className={styles.tabCardArrow}>{tab === 'journal' ? '▲' : '▼'}</span>
+        </button>
+
+        <button
+          className={`${styles.tabCard} ${styles.tabCardTravel} ${tab === 'travel' ? styles.tabCardActive : ''}`}
+          onClick={() => setTab(tab === 'travel' ? null : 'travel')}
+        >
+          <span className={styles.tabCardIcon}>✈</span>
+          <span className={styles.tabCardLabel}>Travel Log</span>
+          <span className={styles.tabCardArrow}>{tab === 'travel' ? '▲' : '▼'}</span>
         </button>
       </div>
 
@@ -167,6 +177,15 @@ export default function Dashboard() {
               </div>
             )}
           </section>
+        </div>
+      )}
+
+    </div>
+
+      {/* ── TRAVEL PANEL ── */}
+      {tab === 'travel' && (
+        <div className={`${styles.tabPanel} ${styles.tabPanelTravel}`} key="travel">
+          <TravelLog />
         </div>
       )}
 

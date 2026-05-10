@@ -90,3 +90,36 @@ export interface SavedReflection {
   content: string
   created_at: string
 }
+
+export interface Trip {
+  id: string
+  user_id: string
+  destination: string
+  country: string | null
+  start_date: string
+  end_date: string | null
+  is_active: boolean
+  summary: TripSummary | null
+  created_at: string
+}
+
+export interface TripSummary {
+  overallFeeling: string
+  topMemories: string
+  wouldGoBack: string
+  whatItGaveYou: string
+}
+
+export interface TravelEntry {
+  id: string
+  user_id: string
+  trip_id: string
+  entry_date: string
+  location: string
+  moment: string
+  food: string
+  people: string
+  surprise: string
+  feeling: string
+  created_at: string
+}

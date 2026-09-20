@@ -10,12 +10,13 @@ import TravelLog from '../components/TravelLog'
 import ClaudeInsights from '../components/ClaudeInsights'
 import styles from './Dashboard.module.css'
 
-const TYPE_LABELS = { daily: 'Evening Check-in', freewrite: 'Free Write', weekly: 'Weekly Reflection', morning: 'Morning Check-in' }
+const TYPE_LABELS = { daily: 'Evening Check-in', freewrite: 'Free Write', weekly: 'Weekly Reflection', morning: 'Morning Check-in', critical: 'Critical Experience Reflection' }
 const TYPE_PROMPTS = {
   morning: 'Energy · Gratitude · Intention · ~5 min',
   daily: '6 guided questions · ~10 minutes',
   freewrite: 'Open page · write freely',
   weekly: 'Patterns & growth · ~15 minutes',
+  critical: "Gibbs' Reflective Cycle · ~20 minutes",
 }
 
 function getPreview(entry: Entry): string {
@@ -24,6 +25,7 @@ function getPreview(entry: Entry): string {
   if (entry.type === 'daily') return (c.highlight as string) || ''
   if (entry.type === 'freewrite') return (c.text as string) || ''
   if (entry.type === 'weekly') return (c.wins as string) || ''
+  if (entry.type === 'critical') return (c.title as string) || (c.description as string) || ''
   return ''
 }
 
@@ -183,9 +185,9 @@ export default function Dashboard() {
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>Begin a new entry</h2>
             <div className={styles.entryCards}>
-              {(['morning', 'daily', 'freewrite', 'weekly'] as const).map(type => {
+              {(['morning', 'daily', 'freewrite', 'weekly', 'critical'] as const).map(type => {
                 const done = type === 'morning' ? hasMorningToday : type === 'daily' ? hasEntryToday : type === 'weekly' ? hasWeeklyThisWeek : false
-                const icons = { morning: '🌅', daily: '🌆', freewrite: '✦', weekly: '◈' }
+                const icons = { morning: '🌅', daily: '🌆', freewrite: '✦', weekly: '◈', critical: '◎' }
                 return (
                   <button key={type} className={`${styles.entryTypeCard} ${done ? styles.done : ''}`} onClick={() => navigate(`/new/${type}`)}>
                     <span className={styles.typeIcon}>{icons[type]}</span>

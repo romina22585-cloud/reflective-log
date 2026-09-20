@@ -1,4 +1,4 @@
-export type EntryType = 'daily' | 'freewrite' | 'weekly' | 'morning'
+export type EntryType = 'daily' | 'freewrite' | 'weekly' | 'morning' | 'critical'
 
 export interface DailyContent {
   [key: string]: unknown
@@ -33,13 +33,25 @@ export interface WeeklyContent {
   rating: number
 }
 
+// Critical Experience Reflection — structured on Gibbs' Reflective Cycle (1988)
+export interface CriticalContent {
+  [key: string]: unknown
+  title: string
+  description: string
+  feelings: string
+  evaluation: string
+  analysis: string
+  conclusion: string
+  actionPlan: string
+}
+
 export interface Article {
   url: string
   title: string
   addedAt: string
 }
 
-export type EntryContent = DailyContent | MorningContent | FreewriteContent | WeeklyContent
+export type EntryContent = DailyContent | MorningContent | FreewriteContent | WeeklyContent | CriticalContent
 
 export interface Entry {
   id: string

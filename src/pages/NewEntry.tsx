@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useEntries } from '../hooks/useEntries'
-import { EntryType, DailyContent, FreewriteContent, WeeklyContent, MorningContent, Article } from '../types'
+import { EntryType, DailyContent, FreewriteContent, WeeklyContent, MorningContent, CriticalContent, Article } from '../types'
 import styles from './NewEntry.module.css'
 
 const WEEKLY_FIELDS = [
@@ -10,6 +10,16 @@ const WEEKLY_FIELDS = [
   { key: 'difficult', label: 'What was difficult', prompt: 'What challenged you most this week? What did it reveal about you?' },
   { key: 'learned', label: 'What I learned', prompt: 'What is one insight or lesson from this week you want to carry forward?' },
   { key: 'nextWeek', label: 'Intention for next week', prompt: 'What do you want to do differently or focus on next week?' },
+]
+
+// Gibbs' Reflective Cycle (1988) — six stages
+const CRITICAL_FIELDS = [
+  { key: 'description', label: '1. Description', prompt: 'What happened? Set the scene — where you were, who was involved, what you did and what others did.' },
+  { key: 'feelings', label: '2. Feelings', prompt: 'What were you thinking and feeling before, during and after? How do you think others felt?' },
+  { key: 'evaluation', label: '3. Evaluation', prompt: 'What was good and what was bad about the experience? What went well, and what did not?' },
+  { key: 'analysis', label: '4. Analysis', prompt: 'Why did things unfold the way they did? What theory, evidence or past experience helps you make sense of it?' },
+  { key: 'conclusion', label: '5. Conclusion', prompt: 'What else could you have done? What have you learned about yourself, others or the situation?' },
+  { key: 'actionPlan', label: '6. Action plan', prompt: 'If this happened again, what would you do differently? What will you do next to develop?' },
 ]
 
 function EnergyPicker({ value, onChange }: { value: number; onChange: (n: number) => void }) {
@@ -294,6 +304,36 @@ function WeeklyForm({ onSave }: { onSave: (content: WeeklyContent) => void }) {
   )
 }
 
+// ── CRITICAL EXPERIENCE FORM (Gibbs) ───────────────────────────
+function CriticalForm({ onSave }: { onSave: (content: CriticalContent) => void }) {
+  const [title, setTitle] = useState('')
+  const [answers, setAnswers] = useState<Record<string, string>>({})
+  const allFilled = CRITICAL_FIELDS.every(f => answers[f.key]?.trim())
+  return (
+    <div className={styles.form}>
+      <div className={styles.stepContent}>
+        <h2 className={styles.stepQuestion}>Critical experience reflection</h2>
+        <p className={styles.stepPrompt}>Work through a significant experience using Gibbs' Reflective Cycle.</p>
+      </div>
+      <div className={`${styles.weeklyField} field`}>
+        <label>Title <span className={styles.optionalBadge}>Optional</span></label>
+        <p className={styles.fieldPrompt}>Give this experience a short name so you can find it later.</p>
+        <input type="text" placeholder="e.g. Difficult conversation with a manager" value={title} onChange={e => setTitle(e.target.value)} />
+      </div>
+      {CRITICAL_FIELDS.map(field => (
+        <div className={`${styles.weeklyField} field`} key={field.key}>
+          <label>{field.label}</label>
+          <p className={styles.fieldPrompt}>{field.prompt}</p>
+          <textarea placeholder="Write freely…" value={answers[field.key] || ''} onChange={e => setAnswers(a => ({ ...a, [field.key]: e.target.value }))} rows={4} />
+        </div>
+      ))}
+      <div className={styles.formActions}>
+        <button type="button" className="btn btn-primary" onClick={() => onSave({ title: title.trim(), ...answers } as unknown as CriticalContent)} disabled={!allFilled}>Save reflection</button>
+      </div>
+    </div>
+  )
+}
+
 // ── MAIN ───────────────────────────────────────────────────────
 export default function NewEntry() {
   const { type } = useParams<{ type: string }>()
@@ -304,7 +344,7 @@ export default function NewEntry() {
   const [saveError, setSaveError] = useState('')
   const entryType = (type as EntryType) || 'daily'
 
-  const handleSave = async (content: DailyContent | FreewriteContent | WeeklyContent | MorningContent) => {
+  const handleSave = async (content: DailyContent | FreewriteContent | WeeklyContent | MorningContent | CriticalContent) => {
     setSaving(true); setSaveError('')
     const { error } = await createEntry(entryType, content)
     setSaving(false)
@@ -330,6 +370,7 @@ export default function NewEntry() {
       {entryType === 'daily' && <EveningForm onSave={handleSave} />}
       {entryType === 'freewrite' && <FreewriteForm onSave={handleSave} />}
       {entryType === 'weekly' && <WeeklyForm onSave={handleSave} />}
+      {entryType === 'critical' && <CriticalForm onSave={handleSave} />}
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { useEntries } from '../hooks/useEntries'
 import { format } from 'date-fns'
-import { DailyContent, FreewriteContent, WeeklyContent, MorningContent } from '../types'
+import { DailyContent, FreewriteContent, WeeklyContent, MorningContent, CriticalContent } from '../types'
 import AIReflection from '../components/AIReflection'
 import styles from './EntryDetail.module.css'
 
@@ -26,6 +26,16 @@ const WEEKLY_LABELS: Record<string, string> = {
   learned: 'What I learned',
   nextWeek: 'Intention for next week',
 }
+
+const CRITICAL_LABELS: Record<string, string> = {
+  description: 'Description — what happened',
+  feelings: 'Feelings — what I was thinking and feeling',
+  evaluation: 'Evaluation — what was good and bad',
+  analysis: 'Analysis — making sense of it',
+  conclusion: 'Conclusion — what I learned',
+  actionPlan: 'Action plan — what I will do next',
+}
+const CRITICAL_ORDER = ['description', 'feelings', 'evaluation', 'analysis', 'conclusion', 'actionPlan']
 
 const MORNING_LABELS: Record<string, string> = {
   energy: 'Energy level',
@@ -54,8 +64,11 @@ export default function EntryDetail() {
     <div className={styles.page}>
       <div className={styles.header}>
         <span className={`tag tag-${entry.type}`}>
-          {entry.type === 'daily' ? 'Evening Check-in' : entry.type === 'freewrite' ? 'Free Write' : entry.type === 'morning' ? 'Morning Check-in' : 'Weekly Reflection'}
+          {entry.type === 'daily' ? 'Evening Check-in' : entry.type === 'freewrite' ? 'Free Write' : entry.type === 'morning' ? 'Morning Check-in' : entry.type === 'critical' ? 'Critical Experience Reflection' : 'Weekly Reflection'}
         </span>
+        {entry.type === 'critical' && (entry.content as CriticalContent).title && (
+          <h1 className={styles.date}>{(entry.content as CriticalContent).title}</h1>
+        )}
         <h1 className={styles.date}>{format(new Date(entry.created_at), 'EEEE, d MMMM yyyy')}</h1>
         <p className={styles.time}>{format(new Date(entry.created_at), 'h:mm a')}</p>
       </div>
@@ -149,6 +162,20 @@ export default function EntryDetail() {
           })}
         </div>
       )}
+
+      {entry.type === 'critical' && (() => {
+        const c = entry.content as CriticalContent
+        return (
+          <div className={styles.sections}>
+            {CRITICAL_ORDER.filter(key => c[key]).map(key => (
+              <div key={key} className={styles.section}>
+                <p className={styles.sectionLabel}>{CRITICAL_LABELS[key]}</p>
+                <p className={styles.sectionText}>{c[key] as string}</p>
+              </div>
+            ))}
+          </div>
+        )
+      })()}
 
       <AIReflection entry={entry} />
     </div>

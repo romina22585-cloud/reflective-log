@@ -214,6 +214,7 @@ p { line-height: 1.7; }
 .tag-daily { background: rgba(201, 150, 58, 0.15); color: var(--rust); }
 .tag-freewrite { background: rgba(107, 124, 92, 0.15); color: var(--sage); }
 .tag-weekly { background: rgba(74, 63, 47, 0.12); color: var(--ink-soft); }
+.tag-critical { background: rgba(160, 82, 45, 0.12); color: var(--rust); }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }

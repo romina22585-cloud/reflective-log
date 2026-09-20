@@ -13,7 +13,7 @@ const DAYS_WINDOW = 14
 function serializeEntry(entry: Entry): string {
   const c = entry.content as Record<string, unknown>
   const date = format(new Date(entry.created_at), 'EEE d MMM')
-  const lines: string[] = [`[${date} — ${entry.type === 'daily' ? 'EVENING CHECK-IN' : entry.type === 'morning' ? 'MORNING CHECK-IN' : entry.type.toUpperCase()}]`]
+  const lines: string[] = [`[${date} — ${entry.type === 'daily' ? 'EVENING CHECK-IN' : entry.type === 'morning' ? 'MORNING CHECK-IN' : entry.type === 'critical' ? 'CRITICAL EXPERIENCE REFLECTION' : entry.type.toUpperCase()}]`]
   if (entry.type === 'morning') {
     if (c.energy) lines.push(`Energy: ${c.energy}/5`)
     if (c.gratitude) lines.push(`Gratitude: ${c.gratitude}`)
@@ -33,6 +33,14 @@ function serializeEntry(entry: Entry): string {
     if (c.difficult) lines.push(`Difficult: ${c.difficult}`)
     if (c.learned) lines.push(`Learned: ${c.learned}`)
     if (c.nextWeek) lines.push(`Next week: ${c.nextWeek}`)
+  } else if (entry.type === 'critical') {
+    if (c.title) lines.push(`Title: ${c.title}`)
+    if (c.description) lines.push(`Description: ${c.description}`)
+    if (c.feelings) lines.push(`Feelings: ${c.feelings}`)
+    if (c.evaluation) lines.push(`Evaluation: ${c.evaluation}`)
+    if (c.analysis) lines.push(`Analysis: ${c.analysis}`)
+    if (c.conclusion) lines.push(`Conclusion: ${c.conclusion}`)
+    if (c.actionPlan) lines.push(`Action plan: ${c.actionPlan}`)
   }
   return lines.join('\n')
 }

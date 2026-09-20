@@ -29,6 +29,14 @@ function buildPrompt(entry: Entry): string {
     if (c.patterns) lines.push(`Patterns: ${c.patterns}`)
     if (c.difficult) lines.push(`Difficult: ${c.difficult}`)
     if (c.learned) lines.push(`Learned: ${c.learned}`)
+  } else if (entry.type === 'critical') {
+    if (c.title) lines.push(`Title: ${c.title}`)
+    if (c.description) lines.push(`Description: ${c.description}`)
+    if (c.feelings) lines.push(`Feelings: ${c.feelings}`)
+    if (c.evaluation) lines.push(`Evaluation: ${c.evaluation}`)
+    if (c.analysis) lines.push(`Analysis: ${c.analysis}`)
+    if (c.conclusion) lines.push(`Conclusion: ${c.conclusion}`)
+    if (c.actionPlan) lines.push(`Action plan: ${c.actionPlan}`)
   }
   return `You are a thoughtful executive coach. A professional shared this journal entry:
 ---

@@ -8,6 +8,7 @@ import { useProfile } from '../hooks/useProfile'
 import MultiEntryInsights from '../components/MultiEntryInsights'
 import TravelLog from '../components/TravelLog'
 import ClaudeInsights from '../components/ClaudeInsights'
+import EmotionalIntelligence from '../components/EmotionalIntelligence'
 import styles from './Dashboard.module.css'
 
 const TYPE_LABELS = { daily: 'Evening Check-in', freewrite: 'Free Write', weekly: 'Weekly Reflection', morning: 'Morning Check-in', critical: 'Critical Experience Reflection' }
@@ -99,7 +100,7 @@ function GroupedEntries({ entries, onNavigate, onDelete, typeLabels, getPreview 
   )
 }
 
-type Tab = 'habits' | 'journal' | 'travel' | null
+type Tab = 'habits' | 'journal' | 'travel' | 'ei' | null
 
 export default function Dashboard() {
   const { displayName } = useProfile()
@@ -168,6 +169,15 @@ export default function Dashboard() {
           <span className={styles.tabCardIcon}>✈</span>
           <span className={styles.tabCardLabel}>Travel Log</span>
           <span className={styles.tabCardArrow}>{tab === 'travel' ? '▲' : '▼'}</span>
+        </button>
+
+        <button
+          className={`${styles.tabCard} ${styles.tabCardEI} ${tab === 'ei' ? styles.tabCardActive : ''}`}
+          onClick={() => setTab(tab === 'ei' ? null : 'ei')}
+        >
+          <span className={styles.tabCardIcon}>❋</span>
+          <span className={styles.tabCardLabel}>Emotional Intelligence</span>
+          <span className={styles.tabCardArrow}>{tab === 'ei' ? '▲' : '▼'}</span>
         </button>
       </div>
 
@@ -256,6 +266,13 @@ export default function Dashboard() {
       {tab === 'travel' && (
         <div className={`${styles.tabPanel} ${styles.tabPanelTravel}`} key="travel">
           <TravelLog />
+        </div>
+      )}
+
+      {/* ── EMOTIONAL INTELLIGENCE PANEL ── */}
+      {tab === 'ei' && (
+        <div className={`${styles.tabPanel} ${styles.tabPanelEI}`} key="ei">
+          <EmotionalIntelligence />
         </div>
       )}
 

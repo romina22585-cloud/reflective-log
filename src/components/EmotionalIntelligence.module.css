@@ -1,0 +1,125 @@
+/* Emotional Intelligence tab — plum */
+.wrapper { --plum: #7d4e6b; --plum-soft: rgba(125, 78, 107, 0.08); --plum-line: rgba(125, 78, 107, 0.22); animation: fadeUp 0.3s ease forwards; }
+
+.home, .form { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.muted { font-size: 0.8rem; color: var(--ink-muted); font-style: italic; }
+.error { color: var(--rust); font-size: 0.85rem; }
+.note { font-size: 0.82rem; color: var(--ink-soft); background: var(--plum-soft); border-left: 3px solid var(--plum); padding: 0.7rem 0.9rem; border-radius: var(--radius); }
+.optional { font-size: 0.62rem; letter-spacing: 0.06em; color: var(--ink-muted); background: var(--parchment-dark); padding: 0.1rem 0.45rem; border-radius: 2rem; margin-left: 0.4rem; }
+
+.setup { padding: 1.25rem; background: white; border: 1px solid var(--plum-line); border-radius: var(--radius-lg); font-size: 0.9rem; color: var(--ink-soft); }
+.setupTitle { font-weight: 600; color: var(--plum); margin-bottom: 0.3rem; }
+
+.sectionTitle { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 0.75rem; }
+
+/* Focus banner */
+.focusBanner { padding: 1rem 1.25rem; background: var(--plum-soft); border: 1px solid var(--plum-line); border-radius: var(--radius-lg); }
+.focusLabel { font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--plum); }
+.focusName { font-family: var(--font-display); font-size: 1.4rem; font-weight: 300; color: var(--ink); line-height: 1.2; }
+.focusTag { display: inline-block; margin-left: 0.5rem; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: white; background: var(--plum); padding: 0.1rem 0.45rem; border-radius: 2rem; vertical-align: middle; }
+
+/* Home cards */
+.cards { display: flex; flex-direction: column; gap: 0.75rem; }
+.card { display: flex; align-items: center; gap: 1rem; width: 100%; padding: 1.1rem 1.25rem; background: white; border: 1px solid var(--parchment-deeper); border-radius: var(--radius-lg); cursor: pointer; text-align: left; transition: all 200ms ease; }
+.card:hover { border-color: var(--plum); box-shadow: 0 4px 16px rgba(125, 78, 107, 0.12); transform: translateY(-1px); }
+.cardDone { background: var(--parchment); }
+.cardIcon { font-size: 1.3rem; color: var(--plum); width: 1.8rem; text-align: center; flex-shrink: 0; }
+.cardName { font-weight: 500; font-size: 0.95rem; color: var(--ink); margin-bottom: 0.15rem; }
+.cardHint { font-size: 0.78rem; color: var(--ink-muted); }
+.doneBadge { margin-left: auto; width: 1.4rem; height: 1.4rem; border-radius: 50%; background: var(--plum); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; flex-shrink: 0; }
+
+/* Lists */
+.list { display: flex; flex-direction: column; gap: 0.5rem; }
+.row { padding: 0.85rem 1rem; background: white; border: 1px solid var(--parchment-deeper); border-radius: var(--radius-lg); }
+.rowTop { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.rowTitle { font-size: 0.88rem; font-weight: 500; color: var(--ink); }
+.rowMeta { font-size: 0.74rem; color: var(--ink-muted); }
+.rowText { font-size: 0.86rem; color: var(--ink-soft); margin-top: 0.4rem; line-height: 1.5; }
+.rowSub { font-size: 0.74rem; color: var(--plum); margin-top: 0.25rem; }
+.emotionChip { color: white; font-size: 0.74rem; font-weight: 500; padding: 0.15rem 0.6rem; border-radius: 2rem; }
+.deleteBtn { margin-left: auto; background: none; border: none; color: var(--ink-muted); cursor: pointer; font-size: 0.7rem; padding: 0.3rem; border-radius: var(--radius); }
+.deleteBtn:hover { color: var(--rust); background: rgba(160, 82, 45, 0.08); }
+
+/* Forms */
+.backBtn { align-self: flex-start; background: none; border: none; color: var(--ink-muted); font-family: var(--font-body); font-size: 0.82rem; cursor: pointer; padding: 0.2rem 0; }
+.backBtn:hover { color: var(--plum); }
+.formTitle { font-size: 1.7rem; color: var(--ink); }
+.formIntro { font-size: 0.9rem; color: var(--ink-soft); margin-top: -0.75rem; }
+.block { display: flex; flex-direction: column; gap: 0.6rem; }
+.label { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); }
+.fieldPrompt { font-size: 0.82rem; color: var(--ink-muted); font-style: italic; }
+.actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.savedScreen { text-align: center; padding: 3rem 1rem; color: var(--plum); font-family: var(--font-display); font-size: 1.5rem; }
+.savedScreen span { display: block; font-size: 2rem; margin-bottom: 0.5rem; }
+
+/* Quadrants */
+.quadGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+.quadBtn { display: flex; flex-direction: column; gap: 0.15rem; padding: 0.9rem 0.75rem; background: white; border: 2px solid; border-radius: var(--radius-lg); cursor: pointer; text-align: left; transition: all 150ms ease; font-family: var(--font-body); }
+.quadBtn:hover { transform: translateY(-1px); }
+.quadActive { color: white !important; }
+.quadHint { font-size: 0.95rem; font-weight: 500; }
+.quadLabel { font-size: 0.7rem; opacity: 0.85; }
+
+/* Chips */
+.chips { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.chip { padding: 0.4rem 0.8rem; background: white; border: 1px solid var(--parchment-deeper); border-radius: 2rem; font-family: var(--font-body); font-size: 0.82rem; color: var(--ink-soft); cursor: pointer; transition: all 150ms ease; }
+.chip:hover { border-color: var(--plum); }
+.chipActive { background: var(--plum); border-color: var(--plum); color: white; }
+
+/* 1–5 scale */
+.scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.4rem; }
+.scaleBtn { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; padding: 0.6rem 0.2rem; background: white; border: 1px solid var(--parchment-deeper); border-radius: var(--radius-lg); cursor: pointer; font-family: var(--font-body); transition: all 150ms ease; }
+.scaleBtn:hover { border-color: var(--plum); }
+.scaleActive { background: var(--plum); border-color: var(--plum); color: white; }
+.scaleNum { font-size: 1.05rem; font-weight: 500; }
+.scaleLabel { font-size: 0.62rem; opacity: 0.8; }
+
+/* Practice library */
+.domain { border: 1px solid var(--parchment-deeper); border-radius: var(--radius-lg); background: white; overflow: hidden; }
+.domainHeader { display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%; padding: 1rem 1.1rem; background: none; border: none; cursor: pointer; text-align: left; font-family: var(--font-body); }
+.domainHeader:hover { background: var(--plum-soft); }
+.domainPart { font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--plum); }
+.domainLabel { font-family: var(--font-display); font-size: 1.3rem; color: var(--ink); line-height: 1.2; }
+.domainDesc { font-size: 0.8rem; color: var(--ink-muted); margin-top: 0.15rem; }
+.chevron { font-size: 0.55rem; color: var(--ink-muted); flex-shrink: 0; }
+.competency { padding: 0.75rem 1.1rem 1rem; border-top: 1px solid var(--parchment); display: flex; flex-direction: column; gap: 0.45rem; }
+.competencyLabel { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); }
+.practice { border: 1px solid var(--parchment-deeper); border-radius: var(--radius-lg); }
+.practiceOpen { border-color: var(--plum-line); background: var(--plum-soft); }
+.practiceHeader { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; width: 100%; padding: 0.7rem 0.9rem; background: none; border: none; cursor: pointer; text-align: left; font-family: var(--font-body); }
+.practiceTitle { font-size: 0.9rem; font-weight: 500; color: var(--ink); }
+.practiceMeta { font-size: 0.72rem; color: var(--ink-muted); white-space: nowrap; }
+.practiceBody { padding: 0 0.9rem 0.9rem; display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.87rem; color: var(--ink-soft); }
+.practiceSub { font-size: 0.66rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--plum); margin-top: 0.3rem; }
+.practiceSource { font-size: 0.72rem; color: var(--ink-muted); font-style: italic; margin-bottom: 0.4rem; }
+.practiceBody :global(.btn) { align-self: flex-start; }
+
+/* Assessment */
+.resultDomain { background: white; border: 1px solid var(--parchment-deeper); border-radius: var(--radius-lg); padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+.resultRow { display: flex; flex-direction: column; gap: 0.3rem; }
+.resultHead { display: flex; justify-content: space-between; gap: 0.75rem; font-size: 0.86rem; color: var(--ink); }
+.resultScore { font-weight: 500; white-space: nowrap; }
+.up { color: #4a7c4e; font-size: 0.75rem; }
+.down { color: var(--rust); font-size: 0.75rem; }
+.bar { height: 6px; background: var(--parchment-dark); border-radius: 3px; overflow: hidden; }
+.barFill { height: 100%; background: var(--plum); border-radius: 3px; transition: width 400ms ease; }
+.idealSelf { padding: 0.9rem 1.1rem; background: var(--plum-soft); border: 1px solid var(--plum-line); border-radius: var(--radius-lg); font-size: 0.9rem; color: var(--ink-soft); font-style: italic; }
+.rateRow { display: flex; flex-direction: column; gap: 0.45rem; padding-top: 0.75rem; border-top: 1px solid var(--parchment); }
+.rateStatement { font-size: 0.9rem; color: var(--ink); line-height: 1.5; }
+.rateBtns { display: flex; gap: 0.4rem; }
+.rateBtn { width: 2.4rem; height: 2.4rem; background: white; border: 1px solid var(--parchment-deeper); border-radius: 50%; font-family: var(--font-body); font-size: 0.9rem; color: var(--ink-soft); cursor: pointer; transition: all 150ms ease; }
+.rateBtn:hover { border-color: var(--plum); }
+.rateActive { background: var(--plum); border-color: var(--plum); color: white; }
+
+/* Coach */
+.coachCard { background: white; border: 1px solid var(--plum-line); border-radius: var(--radius-lg); padding: 1.1rem 1.25rem; display: flex; flex-direction: column; gap: 0.9rem; }
+.coachSection { display: flex; flex-direction: column; gap: 0.25rem; }
+.coachText { font-size: 0.9rem; color: var(--ink-soft); white-space: pre-wrap; }
+.coachCard :global(.btn) { align-self: flex-start; }
+
+/* Coaching log */
+.linkBtn { align-self: flex-start; background: none; border: none; padding: 0.5rem 0 0.1rem; font-family: var(--font-body); font-size: 0.8rem; font-weight: 500; color: var(--plum); cursor: pointer; text-align: left; }
+.linkBtn:hover { text-decoration: underline; }
+.checkRow { display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--ink-soft); cursor: pointer; padding: 0.4rem 0; }
+.checkRow input { width: 1.1rem; height: 1.1rem; accent-color: var(--plum); }

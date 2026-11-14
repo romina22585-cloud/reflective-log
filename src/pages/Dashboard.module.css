@@ -505,3 +505,33 @@
   background: var(--parchment);
   transform: none;
 }
+
+/* Emotional Intelligence tab — plum */
+.tabCardEI {
+  background: rgba(125, 78, 107, 0.08);
+  border-color: rgba(125, 78, 107, 0.2);
+  color: #7d4e6b;
+}
+
+.tabCardEI:hover {
+  background: rgba(125, 78, 107, 0.13);
+  border-color: rgba(125, 78, 107, 0.4);
+  transform: translateY(-1px);
+}
+
+.tabCardEI.tabCardActive {
+  background: #7d4e6b;
+  border-color: #7d4e6b;
+  color: white;
+  box-shadow: 0 4px 16px rgba(125, 78, 107, 0.3);
+}
+
+.tabPanelEI {
+  background: rgba(125, 78, 107, 0.03);
+  border: 1px solid rgba(125, 78, 107, 0.12);
+}
+
+/* Four tabs: 2 x 2 grid */
+.tabChooser {
+  grid-template-columns: 1fr 1fr !important;
+}

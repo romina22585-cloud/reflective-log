@@ -135,3 +135,50 @@ export interface TravelEntry {
   feeling: string
   created_at: string
 }
+
+// ── Emotional Intelligence tab ────────────────────────────────
+export interface EICheckin {
+  id: string
+  user_id: string
+  quadrant: string
+  emotion: string
+  intensity: number
+  trigger: string | null
+  body: string | null
+  response: string | null
+  reaction: string | null
+  created_at: string
+}
+
+export interface EIPracticeLog {
+  id: string
+  user_id: string
+  practice_id: string
+  note: string | null
+  logged_date: string
+  created_at: string
+}
+
+export interface EIAssessment {
+  id: string
+  user_id: string
+  ratings: Record<string, number>
+  focus: string | null
+  ideal_self: string | null
+  created_at: string
+}
+
+export interface EICoachingItem {
+  id: string
+  user_id: string
+  checkin_id: string | null
+  title: string
+  what_happened: string | null
+  felt: string | null
+  did: string | null
+  want: string | null
+  discussed: boolean
+  takeaway: string | null
+  discussed_at: string | null
+  created_at: string
+}
